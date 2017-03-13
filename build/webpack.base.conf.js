@@ -1,37 +1,53 @@
-var path = require('path')
-var utils = require('./utils')
-var config = require('../config')
-var vueLoaderConfig = require('./vue-loader.conf')
+'use strict'
 
-function resolve (dir) {
-  return path.join(__dirname, '..', dir)
-}
+const path = require('path')
+const config = require('../config')
+const utils = require('./utils')
+const projectRoot = path.resolve(__dirname, '../')
 
 module.exports = {
   entry: {
-    app: './src/main.js'
+    app: ['./client/index.js'],
+    // If you want to support IE < 11, should add `babel-polyfill` to vendor.
+    // e.g. ['babel-polyfill', 'vue', 'vue-router', 'vuex']
+    vendor: [
+      'vue',
+      'vue-router',
+      'vuex',
+      'vuex-router-sync'
+    ]
   },
   output: {
     path: config.build.assetsRoot,
-    filename: '[name].js',
     publicPath: process.env.NODE_ENV === 'production'
       ? config.build.assetsPublicPath
-      : config.dev.assetsPublicPath
+      : config.dev.assetsPublicPath,
+    filename: '[name].js'
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json'],
+    extensions: ['.js', '.vue', '.css', '.json'],
     alias: {
-      'vue$': 'vue/dist/vue.esm.js',
-      '@': resolve('src'),
+      // https://github.com/vuejs/vue/wiki/Vue-2.0-RC-Starter-Resources
+      // vue: 'vue/dist/vue',
+      package: path.resolve(__dirname, '../package.json'),
+      src: path.resolve(__dirname, '../client'),
+      assets: path.resolve(__dirname, '../client/assets'),
+      components: path.resolve(__dirname, '../client/components'),
+      views: path.resolve(__dirname, '../client/views'),
+      // third-party
+      'plotly.js': 'plotly.js/dist/plotly',
+      // vue-addon
+      'vuex-store': path.resolve(__dirname, '../client/store')
     }
   },
   module: {
-    rules: [
+    loaders: [
       {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
-        enforce: "pre",
-        include: [resolve('src'), resolve('test')],
+        include: projectRoot,
+        exclude: /node_modules/,
+        enforce: 'pre',
         options: {
           formatter: require('eslint-friendly-formatter')
         }
@@ -39,12 +55,14 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: 'vue-loader',
-        options: vueLoaderConfig
+        options: require('./vue-loader.conf')
       },
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [resolve('src'), resolve('test')]
+        include: projectRoot,
+        // /node_modules\/(?!vue-bulma-.*)/
+        exclude: [new RegExp(`node_modules\\${path.sep}(?!vue-bulma-.*)`)]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -63,5 +81,9 @@ module.exports = {
         }
       }
     ]
+  },
+  // See https://github.com/webpack/webpack/issues/3486
+  performance: {
+    hints: false
   }
 }

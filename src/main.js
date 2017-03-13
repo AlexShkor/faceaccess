@@ -1,17 +1,44 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import App from './App'
+import axios from 'axios'
+import NProgress from 'vue-nprogress'
+import { sync } from 'vuex-router-sync'
+import App from './App.vue'
 import router from './router'
+import store from './store'
+import * as filters from './filters'
+import { TOGGLE_SIDEBAR } from 'vuex-store/mutation-types'
 
-Vue.use(require('vue-resource'))
+Vue.prototype.$http = axios
+Vue.axios = axios
+Vue.use(NProgress)
 
-Vue.config.productionTip = false
+// Enable devtools
+Vue.config.devtools = true
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  template: '<App/>',
-  components: { App }
+sync(store, router)
+
+const nprogress = new NProgress({ parent: '.nprogress-container' })
+
+const { state } = store
+
+router.beforeEach((route, redirect, next) => {
+  if (state.app.device.isMobile && state.app.sidebar.opened) {
+    store.commit(TOGGLE_SIDEBAR, false)
+  }
+  next()
 })
+
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
+
+const app = new Vue({
+  router,
+  store,
+  nprogress,
+  ...App
+})
+
+app.$mount('#app')
+
+export { app, router, store }
