@@ -13,6 +13,11 @@ export default new Router({
       path: '/',
       component: require('../views/Home')
     },
+    {
+      name: 'User',
+      path: '/users/:id',
+      component: require('../views/userProfile')
+    },
     ...generateRoutesFromMenu(menuModule.state.items),
     {
       path: '*',

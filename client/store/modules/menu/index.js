@@ -21,6 +21,14 @@ const state = {
       component: lazyLoading('dashboard', true)
     },
     {
+      name: 'Users',
+      path: '/users',
+      meta: {
+        icon: 'fa-users',
+      },
+      component: lazyLoading('users', true)
+    },
+    {
       name: 'Axios',
       path: '/axiosDemo',
       meta: {
