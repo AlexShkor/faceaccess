@@ -40,6 +40,7 @@
     "font-awesome": "4.7.0",
     "mdi": "^1.8.36",
     "plotly.js": "^1.24.0",
+    "signalr-client": "0.1.0-preview1-24375",
     "vue": "^2.2.1",
     "vue-bulma-brace": "^0.1.0",
     "vue-bulma-breadcrumb": "^1.0.1",

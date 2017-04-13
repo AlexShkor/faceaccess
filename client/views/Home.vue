@@ -9,6 +9,7 @@
         <button type="button" @click="take_photo">Take Photo</button>
         <button type="button" @click="startStreaming">Start</button>
         <button type="button" @click="stopStreaming">Stop</button>
+        <button type="button" @click="sendBlob">Send</button>
   </div>
 </template>
 
@@ -16,8 +17,31 @@
 import VueWebcam from 'components/Webcam'
 
 
+
 var recordedChunks = [];
 var mediaRecorder = null;
+
+var  webSocketProtocol = location.protocol == "https:" ? "wss:" : "ws:";
+            var webSocketURI = webSocketProtocol + "//" + location.host + "/ws";
+            var socket = new WebSocket(webSocketURI);
+            socket.onopen = function () {
+                console.log("Connected.");
+            };
+            socket.onclose = function (event) {
+                if (event.wasClean) {
+                    console.log('Disconnected.');
+                } else {
+                    console.log('Connection lost.'); // for example if server processes is killed
+                }
+                console.log('Code: ' + event.code + '. Reason: ' + event.reason);
+            };
+            socket.onmessage = function (event) {
+               recordedChunks.push(event.data);
+                console.log("Data received: " + event.data);
+            };
+            socket.onerror = function (error) {
+                console.log("Error: " + error.message);
+            };
 
 export default {
   components: { VueWebcam },
@@ -31,13 +55,11 @@ export default {
       this.photo = this.$refs.webcam.getPhoto()
     },
     startStreaming(){
-
-
       const handleDataAvailable = (event) => {
         console.log(event)
         if (event.data.size > 0) {
-          recordedChunks.push(event.data);
-
+          //recordedChunks.push(event.data);
+          socket.send(event.data);
         } else {
          // ...
         }
@@ -67,6 +89,9 @@ export default {
       this.$refs.webcam.video.src = window.URL.createObjectURL(superBuffer);
       }
       mediaRecorder.stop();
+    },
+    sendBlob(){
+      mediaRecorder.requestData()
     }
   }
 }
