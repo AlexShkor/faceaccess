@@ -40,6 +40,17 @@ compiler.plugin('compilation', compilation => {
   })
 })
 
+
+const allowCorsMiddleware = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    //res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    //res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+    next();
+}
+
+app.use(allowCorsMiddleware)
+
 // proxy api requests
 Object.keys(proxyTable).forEach(context => {
   let options = proxyTable[context]
@@ -58,6 +69,7 @@ app.use(devMiddleware)
 // enable hot-reload and state-preserving
 // compilation error display
 app.use(hotMiddleware)
+
 
 // serve pure static assets
 const staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)

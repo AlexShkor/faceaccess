@@ -16,6 +16,9 @@ export default new Router({
     {
       name: 'User',
       path: '/users/:id',
+       meta: {
+        icon: 'fa-user'
+      },
       component: require('../views/userProfile')
     },
     ...generateRoutesFromMenu(menuModule.state.items),

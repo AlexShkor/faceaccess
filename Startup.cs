@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using VueJsAspNetCoreSample.Documents;
 
 namespace VueJsAspNetCoreSample {
     public class Startup {
@@ -31,6 +32,9 @@ namespace VueJsAspNetCoreSample {
         public void ConfigureServices (IServiceCollection services) {
             // Add framework services.
             services.AddMvc ();
+            // Mongo
+            var db = new MongoDatabase("localhost", 27017);
+            services.AddSingleton(db);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,16 +70,9 @@ namespace VueJsAspNetCoreSample {
                     await next();
                 });
             });
+            app.UseMvc();
 
-            app.UseMvc (routes => {
-                routes.MapRoute (
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-
-                routes.MapSpaFallbackRoute (
-                    name: "spa-fallback",
-                    defaults : new { controller = "Home", action = "Index" });
-            });
+            app.UseCors(cpb => cpb.AllowCredentials().AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
         }
 
         private async Task Echo(WebSocket webSocket)
