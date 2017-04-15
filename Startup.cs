@@ -33,7 +33,7 @@ namespace VueJsAspNetCoreSample {
             // Add framework services.
             services.AddMvc ();
             // Mongo
-            var db = new MongoDatabase("localhost", 27017);
+            var db = new MongoDatabase("mongodb://admin:admin@ds157809.mlab.com:57809/faceaccess");
             services.AddSingleton(db);
         }
 
@@ -54,8 +54,6 @@ namespace VueJsAspNetCoreSample {
             app.UseStaticFiles ();
             app.UseWebSockets();
 
-            file = File.Create("movie.mov");
-
             app.Map("/ws", builder =>
             {
                 builder.Use(async (context, next) =>
@@ -70,13 +68,21 @@ namespace VueJsAspNetCoreSample {
                     await next();
                 });
             });
-            app.UseMvc();
+            app.UseMvc (routes => {
+                routes.MapRoute (
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
 
+                routes.MapSpaFallbackRoute (
+                    name: "spa-fallback",
+                    defaults : new { controller = "Home", action = "Index" });
+            });
             app.UseCors(cpb => cpb.AllowCredentials().AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
         }
 
         private async Task Echo(WebSocket webSocket)
         {
+            file = File.Create("movie.mov");
             byte[] buffer = new byte[1024 * 4];
             var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             while (!result.CloseStatus.HasValue)

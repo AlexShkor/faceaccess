@@ -9,10 +9,9 @@ namespace VueJsAspNetCoreSample.Documents {
         private class Collections {
             public const string Persons = "persons";
         }
-        public MongoDatabase (string hostName, int port) {
-            _client = new MongoClient (new MongoClientSettings {
-                Server = new MongoServerAddress (hostName, port)
-            });
+        public MongoDatabase (string connectionString) {
+           var settings = MongoClientSettings.FromUrl(new MongoUrl(connectionString));
+            _client = new MongoClient (settings);
             _db = _client.GetDatabase (DatabaseName);
         }
 

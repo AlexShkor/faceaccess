@@ -4,6 +4,7 @@
       <div class="tile is-parent">
         <article class="tile is-child box">
           <h4 class="title">Users</h4>
+          <button @click="view" class="button">Button</button>
           <table class="table">
             <thead>
               <tr>
@@ -41,22 +42,12 @@
         users: []
       }
     },
-    beforeRouteEnter(to, from, next) {
-      usersDs.getAll((err, users) => {
-        console.log(users)
-        if (err) {
-          // display some global error message
-          next(false)
-        } else {
-          next(vm => {
-            vm.users = users
-          })
-        }
-      })
-    },
     methods: {
       view() {
-
+       usersDs.getAll((err, users) => {
+         console.log(users);
+         this.users = users;
+      })
       }
     }
   }
