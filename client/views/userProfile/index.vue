@@ -6,12 +6,16 @@
           <h4 class="title">Add Faces</h4>
           <div class="content">
             <div>Пользователь {{ $route.params.id }}</div>
+            <div>Имя {{ currentName }}</div>
+            <div>currentFaceId {{ currentFaceId }}</div>
             <img id='img' :src="currentPhoto" alt="" style="width:400px;height:300px" />
             <canvas id="canvas" width="400" height="300"></canvas>
             <div class="block">
               <button class="button is-primary" @click='takePhoto'>Take Photo</button>
               <button class="button is-success" @click='upload'>Upload Current</button>
-               <button class="button" @click='detect'>Detect</button>
+              <button class="button" @click='detect'>Detect</button>
+              <button class="button" @click='train'>Train</button>
+              <button class="button is-danger" @click='identify'>Identify</button>
             </div>
           </div>
         </article>
@@ -24,6 +28,13 @@
           </div>
         </article>
       </div>
+      <div v-for='photo in photos' class="tile is-parent is-3">
+        <article class="tile is-child box">
+          <div class="content">
+            <img :src='photo.img'/>
+          </div>
+        </article>
+      </div>
     </div>
   </div>
 </template>
@@ -32,6 +43,8 @@
   import usersDs from 'components/UsersDataService'
   import VueWebcam from 'components/Webcam'
 
+  var interval = null;
+
   export default {
     components: {
       VueWebcam
@@ -39,6 +52,8 @@
     data() {
       return {
         currentPhoto: null,
+        currentFaceId: null,
+        currentName: null,
         photos: []
       }
     },
@@ -67,15 +82,43 @@
         usersDs.detectFace(this.$route.params.id, this.currentPhoto.toString('base64')).then((res) => {
           console.log(res)
           var rect = res.data.rect;
-
-           var canvas = document.getElementById('canvas');
-        var ctx = canvas.getContext('2d');
-        ctx.beginPath();
-ctx.lineWidth="2";
-ctx.strokeStyle="green";
-        ctx.rect(rect.left, rect.top, rect.width, rect.height)
-        ctx.stroke();
+          this.currentFaceId = res.data.faceId;
+          var canvas = document.getElementById('canvas');
+          var ctx = canvas.getContext('2d');
+          ctx.beginPath();
+          ctx.lineWidth = "2";
+          ctx.strokeStyle = "green";
+          ctx.rect(rect.left, rect.top, rect.width, rect.height)
+          ctx.stroke();
+          for(let key in res.data.landmarks)
+          {
+            let point = res.data.landmarks[key];
+            console.log(point);
+            ctx.beginPath();
+            ctx.lineWidth = "2";
+            ctx.strokeStyle = "blue";
+            ctx.rect(point.x, point.y, 1, 1)
+            ctx.stroke();
+          }
         })
+      },
+      start(){
+        interval = setInterval(()=>{
+          this.takePhoto();
+          this.detect();
+        }, 3000)
+      },
+      stop(){
+        clearInterval(interval);
+      },
+      train(){
+        usersDs.train();
+      },
+      identify(){
+        this.currentName = '';
+        usersDs.identify(this.currentFaceId).then((res)=>{
+          this.currentName = res.data.name;
+        });
       }
     }
   }

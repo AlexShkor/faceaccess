@@ -18,5 +18,14 @@ export default {
       userId: userId,
       photo: photo
     });
+  },
+  loadImages(userId){
+    return DataService.get('/users/{userid}/faces');
+  },
+  train(){
+    return DataService.post('/users/train', {})
+  },
+  identify(faceId){
+    return DataService.post('/users/identify', {faceId: faceId})
   }
 }
