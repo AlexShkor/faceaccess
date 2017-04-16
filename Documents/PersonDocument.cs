@@ -10,6 +10,7 @@ namespace VueJsAspNetCoreSample.Documents
 
         public string Name {get;set;}
 
-        public Guid RecognitionId {get;set;}
+        public Guid RecognitionId {get; set;}
+        public DateTime Created { get;  set; }
     }
 }

@@ -7,7 +7,9 @@ export default {
     return axios.get(baseUrl + url);
   },
   post(url, data){
-    return axios.post(baseUrl + url, data);
+    return axios.post(baseUrl + url, data, {
+      headers: {'Content-Type': 'application/json'}
+    });
   },
   put(url, data){
     return axios.put(baseUrl + url, data);
