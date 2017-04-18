@@ -4,6 +4,9 @@ export default {
   getAll() {
     return DataService.get("/users");
   },
+  getFaces(userId) {
+    return DataService.get("/users/" + userId + "/faces");
+  },
   createUser(data){
     return DataService.post("/users", data);
   },

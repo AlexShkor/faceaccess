@@ -38,6 +38,7 @@
           <table class="table">
             <thead>
               <tr>
+                <th><abbr title="Position">#</abbr></th>
                 <th>Name</th>
                 <th>Created</th>
                 <th></th>
@@ -45,15 +46,16 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="user in users">
+              <tr v-for="(user, index) in users">
+                <th>
+                 <span>{{index + 1}} </span>
+                </th>
                 <td>
                   <router-link :to="{ name: 'User', params: { id: user.id }}">{{user.name}}</router-link>
                 </td>
                 <td>{{user.created}}</td>
                 <td>{{user.recognitionId}}</td>
-                <td>
 
-                </td>
               </tr>
             </tbody>
           </table>

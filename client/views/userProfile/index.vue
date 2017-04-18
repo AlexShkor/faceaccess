@@ -28,12 +28,31 @@
           </div>
         </article>
       </div>
-      <div v-for='photo in photos' class="tile is-parent is-3">
-        <article class="tile is-child box">
-          <div class="content">
-            <img :src='photo.img'/>
-          </div>
-        </article>
+    </div>
+    <div class="columns is-multiline">
+      <div v-for='(photo, index) in photos' class=" column is-one-quarter ">
+        <div>
+
+         <a class="level-item">
+                <span class="icon is-small">#{{index +1}} </span>
+              </a>
+
+           <nav class="level">
+            <div class="level-left">
+
+
+              <a class="level-item">
+                <span class="icon is-small"><i class="fa fa-heart"></i></span>
+
+              </a>
+               <a class="level-item" title="Delete">
+                <span @click='deleteFace' class="icon is-small"><i class="fa fa-trash"></i></span>
+              </a>
+            </div>
+          </nav>
+          <div></div>
+        </div>
+        <img class="box" v-title="photo.id" :src='photo.img || photo.imageBase64' />
       </div>
     </div>
   </div>
@@ -44,6 +63,7 @@
   import VueWebcam from 'components/Webcam'
 
   var interval = null;
+  const prefix = "data:image/jpeg;base64,";
 
   export default {
     components: {
@@ -56,6 +76,11 @@
         currentName: null,
         photos: []
       }
+    },
+    mounted(){
+      usersDs.getFaces(this.$route.params.id).then((res)=>{
+        this.photos = res.data;
+      })
     },
     methods: {
       takePhoto() {
@@ -73,9 +98,11 @@
           img: this.currentPhoto,
           uploading: true
         };
-        usersDs.addFace(this.$route.params.id, this.currentPhoto.toString('base64')).then(() => {
+        usersDs.addFace(this.$route.params.id, this.currentPhoto.toString('base64')).then((res) => {
           newPhoto.uploading = false;
+          Object.assign(newPhoto, res.data)
         })
+        this.currentPhoto = null;
         this.photos.push(newPhoto);
       },
       detect() {
@@ -90,8 +117,7 @@
           ctx.strokeStyle = "green";
           ctx.rect(rect.left, rect.top, rect.width, rect.height)
           ctx.stroke();
-          for(let key in res.data.landmarks)
-          {
+          for (let key in res.data.landmarks) {
             let point = res.data.landmarks[key];
             console.log(point);
             ctx.beginPath();
@@ -102,21 +128,21 @@
           }
         })
       },
-      start(){
-        interval = setInterval(()=>{
+      start() {
+        interval = setInterval(() => {
           this.takePhoto();
           this.detect();
         }, 3000)
       },
-      stop(){
+      stop() {
         clearInterval(interval);
       },
-      train(){
+      train() {
         usersDs.train();
       },
-      identify(){
+      identify() {
         this.currentName = '';
-        usersDs.identify(this.currentFaceId).then((res)=>{
+        usersDs.identify(this.currentFaceId).then((res) => {
           this.currentName = res.data.name;
         });
       }
