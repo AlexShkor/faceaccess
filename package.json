@@ -1,14 +1,14 @@
 {
-  "name": "vue-admin",
+  "name": "paralect-face-access",
   "version": "0.1.12",
-  "description": "Vue Admin Panel Framework",
-  "repository": "vue-bulma/vue-admin",
-  "homepage": "https://admin.vuebulma.com",
+  "description": "Paralect",
+  "repository": "paralect",
+  "homepage": "https://paralect.com",
   "license": "MIT",
   "author": {
-    "name": "Fangdun Cai",
-    "email": "cfddream@gmail.com",
-    "url": "fundon.me"
+    "name": "Alex Shkor",
+    "email": "alex.shkor@paralect.com",
+    "url": "paralect.com"
   },
   "keywords": [
     "admin",

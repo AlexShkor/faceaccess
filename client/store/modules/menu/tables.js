@@ -12,8 +12,7 @@ export default {
       name: 'BasicTables',
       path: '/tables/basic',
       meta: {
-        label: 'Basic Tables',
-        link: 'tables/Basic.vue'
+        label: 'Basic Tables'
       },
       component: lazyLoading('tables/Basic')
     }
