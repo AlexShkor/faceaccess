@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.ProjectOxford.Face;
+using Microsoft.ProjectOxford.Face.Contract;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using VueJsAspNetCoreSample.Documents;
@@ -99,6 +100,32 @@ namespace VueJsAspNetCoreSample.Controllers {
             });;
         }
 
+        private const double ConfidenceTreshold = 0.8;
+
+        [Route ("check")]
+        [HttpPost]
+        public async Task<IActionResult> Check () {
+            var faceDetect = await _faceClient.DetectAsync(this.Request.Body);
+            var identity = await _faceClient.IdentifyAsync(_personGroupKey,new[]{faceDetect[0].FaceId});
+            var result = identity.FirstOrDefault()?.Candidates.FirstOrDefault() ?? new Candidate();
+            var response = new CheckResponse {
+              Access = false,
+              PersonId = result.PersonId,
+              Confidence = result.Confidence,
+              Name = "Unknown"
+            };
+            if (response.PersonId != null)
+            {
+              var doc = _db.Persons.AsQueryable ().Where (x => x.PersonId == response.PersonId).FirstOrDefault ();
+              response.Name = doc.Name;
+            }
+            if (response.Confidence >= ConfidenceTreshold)
+            {
+              response.Access = true;
+            }
+            return this.Json(response);;
+        }
+
         [Route ("train")]
         [HttpPost]
         public async Task<IActionResult> Train () {
@@ -117,5 +144,13 @@ namespace VueJsAspNetCoreSample.Controllers {
             var doc = _db.Persons.AsQueryable ().Where (x => x.PersonId == result[0].Candidates[0].PersonId).FirstOrDefault ();
             return this.Json (doc);
         }
+    }
+
+    internal class CheckResponse
+    {
+        public bool Access { get; set; }
+        public Guid PersonId { get; set; }
+        public double Confidence { get; set; }
+        public string Name { get; set; }
     }
 }
