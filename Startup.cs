@@ -42,13 +42,13 @@ namespace VueJsAspNetCoreSample {
             loggerFactory.AddConsole (Configuration.GetSection ("Logging"));
             loggerFactory.AddDebug ();
 
-            //if (env.IsDevelopment ()) {
+            if (env.IsDevelopment ()) {
                 app.UseDeveloperExceptionPage ();
                 //app.UseBrowserLink();
                 app.UseWebpackDevMiddleware (new WebpackDevMiddlewareOptions () { HotModuleReplacement = true });
-          //  } else {
-            //    app.UseExceptionHandler ("/Home/Error");
-           // }
+            } else {
+                app.UseExceptionHandler ("/Home/Error");
+            }
 
             app.UseDefaultFiles ();
             app.UseStaticFiles ();

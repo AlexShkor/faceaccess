@@ -1,16 +1,18 @@
-FROM microsoft/dotnet:latest
+# Docker image for .NET Core with webpack
+FROM microsoft/dotnet:1.1.0-sdk-projectjson
+MAINTAINER dave@kybos.be
 
-RUN apt-get update
-RUN apt-get install -y build-essential nodejs nodejs-legacy
+ENV NPM_CONFIG_LOGLEVEL info
+ENV NODE_VERSION 6.2.0
 
-WORKDIR /app
-
-COPY project.json .
-RUN ["dotnet", "restore"]
+RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
+    && tar -zxvf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
+    && rm "node-v$NODE_VERSION-linux-x64.tar.gz" \
+    && npm install -g webpack
 
 COPY . /app
-RUN ["dotnet", "build"]
-
-EXPOSE 5000/tcp
-
-ENTRYPOINT ["dotnet", "run", "--server.urls", "http://0.0.0.0:5000"]
+WORKDIR /app
+RUN dotnet restore
+RUN npm install
+WORKDIR /
+RUN rm -rf /app
