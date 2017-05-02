@@ -4,6 +4,12 @@
       <div class="tile is-parent is-12">
         <article class="tile is-child box">
           <h4 class="title">Reset password</h4>
+          <div v-if="Error != ''">
+            <a class="button is-danger" @click='deleteError'>
+              Error: {{Error}}
+            </a>
+            <br></br>
+          </div>
           <div class="content">
             <div class="control is-grouped">
               <p class="control is-expanded">
@@ -41,8 +47,19 @@
     },
     methods: {
       sendForm(){
-        accountDs.sendResetPasswordForm(this.Email, this.Password, this.ConfirmPassword, this.$route.params[0])
-      }
+       if(this.Password === this.ConfirmPassword){
+         accountDs.sendResetPasswordForm(this.Email, this.Password, this.ConfirmPassword, this.$route.params[0]).then((response)=> {
+         if(response.data.statusCode === 400){
+                 this.Error = response.data.value;
+              }
+            });
+          } else{
+             this.Error = "Password and confirm password don't equal"
+          }
+      },
+      deleteError(){
+          this.Error = '';
+      }     
     }
   }
 </script>

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.ProjectOxford.Face;
 using Microsoft.ProjectOxford.Face.Contract;
@@ -20,7 +21,7 @@ namespace VueJsAspNetCoreSample.Controllers {
         public UsersController (MongoDatabase db) {
             _db = db;
         }
-
+        [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public IActionResult Users () {
             return this.Json (_db.Persons.AsQueryable ());

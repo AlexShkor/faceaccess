@@ -4,7 +4,13 @@
       <div class="tile is-parent is-12">
         <article class="tile is-child box">
           <h4 class="title">Log in</h4>
-          <div class="content">
+          <div v-if="Error != ''">
+              <a class="button is-danger" @click='deleteError'>
+                Error: {{Error}}
+              </a>
+            <br></br>
+          </div>
+          <div class="content"> 
             <div class="control is-grouped">
               <p class="control is-expanded">
                 <input class="input" v-model="Email" type="text" placeholder="Email">
@@ -46,22 +52,31 @@
     data() {
       return {
         Email:'',
-        Password:''
+        Password:'',
+        Error:''
       }
     },
     methods: {
       sendForm(){
         accountDs.sendLoginForm(this.Email, this.Password).then((response) => {
-        if(response.data === "ADMIN"){
+        if(response.data.statusCode === 200){
+            if(response.data.value === "ADMIN"){
                 localStorage.setItem('IsAdmin', true);
-        }
-        if(response.data === "USER"){
+             }
+            if(response.data.value === "USER"){
                 localStorage.setItem('IsAdmin', false);
+             } 
+          location.reload();
         }
-        location.reload();
-        this.$router.go('Home');
+          if(response.data.statusCode === 400){
+          this.Error = response.data.value;
+         }     
         });
-      }
+      },
+      deleteError(){
+       this.Error = "";
+     }
     }
+    
   }
 </script>

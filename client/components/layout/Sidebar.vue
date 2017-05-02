@@ -1,5 +1,5 @@
 <template>
-  <aside class="menu app-sidebar animated" :class="{ slideInLeft: show, slideOutLeft: !show }">
+  <aside class="menu app-sidebar animated" :class="{ slideInLeft: show, slideOutLeft: !show }" v-if="isAuth">
     <p class="menu-label">
       General
     </p>
@@ -47,7 +47,8 @@ export default {
   },
   data () {
     return {
-      isReady: false
+      isReady: false,
+      isAuth: false
     }
   }, 
   mounted () {
@@ -56,6 +57,12 @@ export default {
       this.isReady = true
       this.shouldExpandMatchItem(route)
     }
+    if(localStorage.getItem('IsAdmin')==="false" | localStorage.getItem('IsAdmin')==="true"){
+       this.isAuth = true;
+       }
+      if(localStorage.getItem('IsAdmin')=== undefined){
+       this.isAuth = false;
+       }
   },
 
   computed: mapGetters({

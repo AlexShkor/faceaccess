@@ -4,6 +4,12 @@
       <div class="tile is-parent is-12">
         <article class="tile is-child box">
           <h4 class="title">Registration Account</h4>
+          <div v-if="Error != ''">
+            <a class="button is-danger" @click='deleteError'>
+              Error: {{Error}}
+            </a>
+            <br></br>
+          </div>
           <div class="content">
             <div class="control is-grouped">
               <p class="control is-expanded">
@@ -36,12 +42,24 @@
       return {
         Email:'',
         Password:'',
-		ConfirmPassword:''
+		ConfirmPassword:'',
+    Error:''
       }
     },
     methods: {
       sendForm(){
-        accountDs.sendRegisterForm(this.Email, this.Password, this.ConfirmPassword)
+        if(this.Password === this.ConfirmPassword){
+           accountDs.sendRegisterForm(this.Email, this.Password, this.ConfirmPassword).then((response) => {
+              if(response.data.statusCode === 400){
+                 this.Error = response.data.value;
+              }
+            });
+          } else{
+             this.Error = "Password and confirm password don't equal"
+          }
+      },
+      deleteError(){
+          this.Error = '';
       }
     }
   }

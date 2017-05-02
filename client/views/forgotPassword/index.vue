@@ -6,6 +6,12 @@
           <h4 class="title">Forgot password</h4>
 		      <h3>Follow the link in the email that will be sent to you</h3>
           <br/>
+          <div v-if="Error != ''">
+            <a class="button is-danger" @click='deleteError'>
+              Error: {{Error}}
+            </a>
+            <br></br>
+          </div>
           <div class="content">
             <div class="control is-grouped">
               <p class="control is-expanded">
@@ -30,12 +36,20 @@
   export default {
     data() {
       return {
-        Email:''
+        Email:'',
+        Error:''
       }
     },
     methods: {
       sendForm(){
-        accountDs.forgotPassword(this.Email)
+        accountDs.forgotPassword(this.Email).then((response) =>{
+         if(response.data.statusCode === 400){
+            this.Error = response.data.value;
+          }
+        });
+      },
+      deleteError(){
+        this.Error = '';
       }
     }
   }

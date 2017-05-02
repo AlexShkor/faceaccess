@@ -58,7 +58,7 @@ export default {
        this.isAuth = true;
        }
       if(localStorage.getItem('IsAdmin')=== undefined){
-       this.isAdmin = false;
+       this.isAuth = false;
        }
     },
   computed: mapGetters({

@@ -32,7 +32,7 @@
 
     <div class="tile is-ancestor">
       <div class="tile is-parent">
-        <article class="tile is-child box" v-if='isAdmin'>
+        <article class="tile is-child box">
           <h4 class="title">Users</h4>
 
           <table class="table">
@@ -73,18 +73,9 @@
     data() {
       return {
         userName: '',
-        users: [],
-        isAdmin: false
+        users: []
       }
     }, 
-    mounted() {
-      if(localStorage.getItem('IsAdmin')==="false"){
-       this.isAdmin = false;
-       }
-      if(localStorage.getItem('IsAdmin')==="true"){
-       this.isAdmin = true;
-       }
-    },
     beforeRouteEnter (to, from, next) {
       usersDs.getAll().then((response) => {
         next(vm => {
