@@ -2,33 +2,33 @@ import DataService from './DataService'
 
 export default {
   getAll() {
-    return DataService.get("/users");
+    return DataService.get("api/users");
   },
   getFaces(userId) {
-    return DataService.get("/users/" + userId + "/faces");
+      return DataService.get("api/users/" + userId + "/faces");
   },
   createUser(data){
-    return DataService.post("/users", data);
+      return DataService.post("api/users", data);
   },
   addFace(userId, photo){
-    return DataService.post("/users/faces", {
+      return DataService.post("api/users/faces", {
       userId: userId,
       photo: photo
     });
   },
   detectFace(userId, photo){
-    return DataService.post("/users/detect", {
+      return DataService.post("api/users/detect", {
       userId: userId,
       photo: photo
     });
   },
   loadImages(userId){
-    return DataService.get('/users/{userid}/faces');
+      return DataService.get('api/users/{userid}/faces');
   },
   train(){
-    return DataService.post('/users/train', {})
+      return DataService.post('api/users/train', {})
   },
   identify(faceId){
-    return DataService.post('/users/identify', {faceId: faceId})
+      return DataService.post('api/users/identify', {faceId: faceId})
   }
 }

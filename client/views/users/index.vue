@@ -32,7 +32,7 @@
 
     <div class="tile is-ancestor">
       <div class="tile is-parent">
-        <article class="tile is-child box">
+        <article class="tile is-child box" v-if='isAdmin'>
           <h4 class="title">Users</h4>
 
           <table class="table">
@@ -67,21 +67,31 @@
 
 <script>
   import usersDs from 'components/UsersDataService'
-
+  import accountDs from 'components/AccountDataService'
+  
   export default {
     data() {
       return {
         userName: '',
-        users: []
+        users: [],
+        isAdmin: false
       }
+    }, 
+    mounted() {
+      if(localStorage.getItem('IsAdmin')==="false"){
+       this.isAdmin = false;
+       }
+      if(localStorage.getItem('IsAdmin')==="true"){
+       this.isAdmin = true;
+       }
     },
     beforeRouteEnter (to, from, next) {
       usersDs.getAll().then((response) => {
         next(vm => {
-          vm.users = response.data
-        })
-      })
-    },
+          vm.users = response.data;
+        });
+      });
+    }, 
     methods: {
       view() {
         usersDs.getAll().then((response) => {
@@ -92,7 +102,7 @@
         usersDs.createUser({Name: this.userName}, (err, user) => {
           this.userName = '';
           this.users.push(user);
-        })
+        });
       }
     }
   }

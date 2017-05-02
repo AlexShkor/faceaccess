@@ -4,23 +4,43 @@ import menuModule from 'vuex-store/modules/menu'
 Vue.use(Router)
 
 export default new Router({
-  mode: 'hash', // Demo is living in GitHub.io, so required!
-  linkActiveClass: 'is-active',
-  scrollBehavior: () => ({ y: 0 }),
-  routes: [
-    {
-      name: 'Home',
-      path: '/',
-      component: require('../views/Home')
-    },
-    {
-      name: 'User',
-      path: '/users/:id',
-       meta: {
-        icon: 'fa-user'
+    mode: 'hash', // Demo is living in GitHub.io, so required!
+    linkActiveClass: 'is-active',
+    scrollBehavior: () => ({ y: 0 }),
+    routes: [
+      {
+          name: 'Home',
+          path: '/',
+          component: require('../views/Home')
       },
-      component: require('../views/userProfile')
-    },
+      {
+          name: 'User',
+          path: '/users/:id',
+          meta: {
+              icon: 'fa-user'
+          },
+          component: require('../views/userProfile')
+      },
+      {
+          name: 'Login',
+          path: '/login',
+          component: require('../views/login')
+      },
+       {
+           name: 'RegistrationAccount',
+           path: '/registrationAccount',
+           component: require('../views/registrationAccount')
+       },
+       {
+           name: 'ForgotPassword',
+           path: '/forgotPassword',
+           component: require('../views/forgotPassword')
+       },
+       {
+           name: 'ResetPassword',
+           path: '/resetPassword/*',
+           component: require('../views/resetPassword')
+       },
     ...generateRoutesFromMenu(menuModule.state.items),
     {
       path: '*',

@@ -42,17 +42,14 @@ export default {
   components: {
     Expanding
   },
-
   props: {
     show: Boolean
   },
-
   data () {
     return {
       isReady: false
     }
-  },
-
+  }, 
   mounted () {
     let route = this.$route
     if (route.name) {
