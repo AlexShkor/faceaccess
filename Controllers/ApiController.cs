@@ -44,16 +44,6 @@ namespace VueJsAspNetCoreSample.Controllers {
             return this.Json (doc);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateUser ([FromBody] PersonDocument doc) {
-            var data = _faceClient.CreatePersonAsync (_personGroupKey, doc.Name);
-            doc.PersonId = data.Result.PersonId;
-            doc.Created = DateTime.Now;
-            doc.Id = ObjectId.GenerateNewId ().ToString ();
-            await _db.Persons.InsertOneAsync (doc);
-            return this.Json (doc);
-        }
-
         public class FaceUploadModel {
             public string UserID { get; set; }
             public string Photo { get; set; }

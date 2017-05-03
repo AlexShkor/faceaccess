@@ -4,8 +4,8 @@ export default {
   sendLoginForm(email, password){
       return DataService.post("account/login", {Email:email, Password:password});
   },
-  sendRegisterForm(email, password, confirmPassword){
-      return DataService.post("account/register", {Email:email, Password:password, ConfirmPassword:confirmPassword});
+  sendRegisterForm(email, fullName, password, confirmPassword){
+      return DataService.post("account/register", {Email:email, FullName:fullName, Password:password, ConfirmPassword:confirmPassword});
   },
   forgotPassword(email){
       return DataService.post("account/forgotPassword", {Email:email});

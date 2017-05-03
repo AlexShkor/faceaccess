@@ -4,12 +4,12 @@
       <div class="tile is-parent is-12">
         <article class="tile is-child box">
           <h4 class="title">Log in</h4>
-          <div v-if="Error != ''">
-              <a class="button is-danger" @click='deleteError'>
-                Error: {{Error}}
-              </a>
-            <br></br>
-          </div>
+            <div v-for="error in Errors">
+                <a class="button is-danger" @click='deleteError(error)'>
+                    Error: {{error}}
+                </a>
+                <br></br>
+            </div>
           <div class="content"> 
             <div class="control is-grouped">
               <p class="control is-expanded">
@@ -53,30 +53,37 @@
       return {
         Email:'',
         Password:'',
-        Error:''
+        Errors:[]
       }
     },
     methods: {
-      sendForm(){
-        accountDs.sendLoginForm(this.Email, this.Password).then((response) => {
-        if(response.data.statusCode === 200){
-            if(response.data.value === "ADMIN"){
-                localStorage.setItem('IsAdmin', true);
-             }
-            if(response.data.value === "USER"){
-                localStorage.setItem('IsAdmin', false);
-             } 
-          location.reload();
-        }
-          if(response.data.statusCode === 400){
-          this.Error = response.data.value;
-         }     
-        });
-      },
-      deleteError(){
-       this.Error = "";
+        sendForm(){
+            accountDs.sendLoginForm(this.Email, this.Password).then((response) => {
+                if(response.data.statusCode === 200){
+                    if(response.data.value === "ADMIN"){
+                        localStorage.setItem('IsAdmin', true);
+                    }
+                    if(response.data.value === "USER"){
+                        localStorage.setItem('IsAdmin', false);
+                    } 
+                    location.reload();
+                }
+                if(response.data.statusCode === 400){
+                    if(Object.prototype.toString.call(response.data.value) === '[object Array]' ) {
+                        for (var i = 0; i < response.data.value.length; i++){
+                            this.Errors.push(response.data.value[i].description);
+                        }
+                    }else{
+                        this.Errors.push(response.data.value);
+                    }
+                }
+            });
+        },
+
+      deleteError(data){
+          var index = this.Errors.indexOf(data);
+          this.Errors.splice(index, 1);
      }
-    }
-    
+    }    
   }
 </script>

@@ -6,12 +6,12 @@
           <h4 class="title">Forgot password</h4>
 		      <h3>Follow the link in the email that will be sent to you</h3>
           <br/>
-          <div v-if="Error != ''">
-            <a class="button is-danger" @click='deleteError'>
-              Error: {{Error}}
-            </a>
-            <br></br>
-          </div>
+            <div v-for="error in Errors">
+                <a class="button is-danger" @click='deleteError(error)'>
+                    Error: {{error}}
+                </a>
+                <br></br>
+            </div>
           <div class="content">
             <div class="control is-grouped">
               <p class="control is-expanded">
@@ -37,19 +37,26 @@
     data() {
       return {
         Email:'',
-        Error:''
+        Errors:[]
       }
     },
     methods: {
       sendForm(){
         accountDs.forgotPassword(this.Email).then((response) =>{
-         if(response.data.statusCode === 400){
-            this.Error = response.data.value;
-          }
+            if(response.data.statusCode === 400){
+                if(Object.prototype.toString.call(response.data.value) === '[object Array]' ) {
+                    for (var i = 0; i < response.data.value.length; i++){
+                        this.Errors.push(response.data.value[i].description);
+                    }
+                }else{
+                    this.Errors.push(response.data.value);
+                }
+            }
         });
       },
-      deleteError(){
-        this.Error = '';
+      deleteError(data){
+          var index = this.Errors.indexOf(data);
+          this.Errors.splice(index, 1);
       }
     }
   }

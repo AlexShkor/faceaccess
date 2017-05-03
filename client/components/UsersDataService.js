@@ -7,9 +7,6 @@ export default {
   getFaces(userId) {
       return DataService.get("api/users/" + userId + "/faces");
   },
-  createUser(data){
-      return DataService.post("api/users", data);
-  },
   addFace(userId, photo){
       return DataService.post("api/users/faces", {
       userId: userId,
