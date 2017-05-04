@@ -65,9 +65,9 @@ export default {
        }
   },
 
-  computed: mapGetters({
-    menu: 'menuitems'
-  }),
+    computed:{            
+        ...mapGetters({menu: localStorage.getItem('IsAdmin')==="true" ? 'menuitems' : 'menueitemforuser'})      
+    },
 
   methods: {
     ...mapActions([

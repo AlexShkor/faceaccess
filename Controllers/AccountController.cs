@@ -55,7 +55,7 @@ namespace VueJsAspNetCoreSample.Controllers
                     var user = await _userManager.FindByNameAsync(model.Email);
                     var roles = await _userManager.GetRolesAsync(user);
                     var role = roles.FirstOrDefault();
-                    return this.Json(Ok(role));
+                    return this.Json(Ok(new ArrayList() {role, user.Id}));
                 }                
                     return this.Json(BadRequest("Invalid login or password."));
             }

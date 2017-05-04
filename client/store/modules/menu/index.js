@@ -33,6 +33,33 @@ const state = {
       component: lazyLoading('testing', true)
     },
     tables
+  ],
+  itemsForUser: [
+  {
+      name: 'Dashboard',
+      path: '/dashboard',
+      meta: {
+          icon: 'fa-tachometer'
+      },
+      component: lazyLoading('dashboard', true)
+  },
+  {
+      name: 'User profile',
+      path: '/users/'+localStorage.getItem('UserId'),
+      meta: {
+          icon: 'fa fa-user-circle-o',
+      },
+      component: lazyLoading('../views/userProfile', true)
+  },
+  {
+      name: 'Testing',
+      path: '/testing',
+      meta: {
+          icon: 'fa-rocket',
+      },
+      component: lazyLoading('testing', true)
+  },
+  tables
   ]
 }
 

@@ -72,8 +72,9 @@ export default {
   ]),
    logOff(){
      accountDs.logOff().then((response) => {
-     localStorage.removeItem('IsAdmin');
-     location.reload();
+         localStorage.removeItem('IsAdmin');
+         localStorage.removeItem('UserId');
+         location.reload();
     });
   }
   }

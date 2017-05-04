@@ -60,12 +60,13 @@
         sendForm(){
             accountDs.sendLoginForm(this.Email, this.Password).then((response) => {
                 if(response.data.statusCode === 200){
-                    if(response.data.value === "ADMIN"){
+                    if(response.data.value[0] === "ADMIN"){
                         localStorage.setItem('IsAdmin', true);
                     }
-                    if(response.data.value === "USER"){
+                    if(response.data.value[0] === "USER"){
                         localStorage.setItem('IsAdmin', false);
-                    } 
+                    }
+                    localStorage.setItem('UserId', response.data.value[1]);
                     location.reload();
                 }
                 if(response.data.statusCode === 400){

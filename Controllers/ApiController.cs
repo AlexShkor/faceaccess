@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.ProjectOxford.Face;
 using Microsoft.ProjectOxford.Face.Contract;
@@ -15,11 +17,13 @@ namespace VueJsAspNetCoreSample.Controllers {
     public class UsersController : Controller {
         private MongoDatabase _db;
         private IFaceServiceClient _faceClient = new FaceServiceClient ("ae10dbb146c749ce8810068d9b83a868");
+        private readonly UserManager<IdentityUser> _userManager;
 
         const string _personGroupKey = "paralect";
 
-        public UsersController (MongoDatabase db) {
+        public UsersController (MongoDatabase db, UserManager<IdentityUser> userManager) {
             _db = db;
+            _userManager = userManager;
         }
         [Authorize(Roles = "ADMIN")]
         [HttpGet]
