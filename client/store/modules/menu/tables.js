@@ -4,7 +4,8 @@ export default {
   name: 'Tables',
   meta: {
     icon: 'fa-table',
-    expanded: false
+    expanded: false,
+    isRequiresAuth: true
   },
 
   children: [
@@ -12,7 +13,8 @@ export default {
       name: 'BasicTables',
       path: '/tables/basic',
       meta: {
-        label: 'Basic Tables'
+          label: 'Basic Tables',
+          isRequiresAuth: true
       },
       component: lazyLoading('tables/Basic')
     }

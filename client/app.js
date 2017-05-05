@@ -23,9 +23,22 @@ const { state } = store
 
 router.beforeEach((route, redirect, next) => {
   if (state.app.device.isMobile && state.app.sidebar.opened) {
-    store.commit(TOGGLE_SIDEBAR, false)
+      store.commit(TOGGLE_SIDEBAR, false);
   }
-  next()
+
+  if (route.meta.isRequiresAuth) {
+      if (localStorage.getItem('UserId') == null) {         
+          next({ name: 'Login' });
+      } else {
+          next();
+      }
+  } else {
+      if (localStorage.getItem('UserId') != null) {
+          next({ name: 'Home' });
+      } else {
+          next();
+      }     
+  }    
 })
 
 Object.keys(filters).forEach(key => {

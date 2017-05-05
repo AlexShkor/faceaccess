@@ -11,35 +11,51 @@ export default new Router({
       {
           name: 'Home',
           path: '/',
-          component: require('../views/Home')
+          component: require('../views/Home'),
+          meta: {
+              isRequiresAuth: false
+          }
       },
       {
           name: 'User',
           path: '/users/:id',
           meta: {
-              icon: 'fa-user'
+              icon: 'fa-user',
+              isRequiresAuth: true
           },
           component: require('../views/userProfile')
       },
       {
           name: 'Login',
           path: '/login',
-          component: require('../views/login')
+          component: require('../views/login'),
+          meta: {
+              isRequiresAuth: false
+          }
       },
        {
            name: 'RegistrationAccount',
            path: '/registrationAccount',
-           component: require('../views/registrationAccount')
+           component: require('../views/registrationAccount'),
+           meta: {
+               isRequiresAuth: false
+           }
        },
        {
            name: 'ForgotPassword',
            path: '/forgotPassword',
-           component: require('../views/forgotPassword')
+           component: require('../views/forgotPassword'),
+           meta: {
+               isRequiresAuth: false
+           }
        },
        {
            name: 'ResetPassword',
            path: '/resetPassword/*',
-           component: require('../views/resetPassword')
+           component: require('../views/resetPassword'),
+           meta: {
+               isRequiresAuth: false
+           }
        },
     ...generateRoutesFromMenu(menuModule.state.items),
     {
