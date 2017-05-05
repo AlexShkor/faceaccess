@@ -21,6 +21,14 @@ export default new Router({
       },
       component: require('../views/userProfile')
     },
+    {
+      name: 'Upload Photos',
+      path: '/users/:id/upload-photos',
+       meta: {
+        icon: 'fa-user'
+      },
+      component: require('../views/uploadPhotos')
+    },
     ...generateRoutesFromMenu(menuModule.state.items),
     {
       path: '*',

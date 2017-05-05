@@ -1,6 +1,6 @@
 # Docker image for .NET Core with webpack
 FROM microsoft/dotnet:1.1.0-sdk-projectjson
-MAINTAINER dave@kybos.be
+MAINTAINER alex.shkor@gmail.com
 
 ENV NPM_CONFIG_LOGLEVEL info
 ENV NODE_VERSION 6.2.0
@@ -14,5 +14,4 @@ COPY . /app
 WORKDIR /app
 RUN dotnet restore
 RUN npm install
-WORKDIR /
-RUN rm -rf /app
+RUN dotnet run

@@ -55,7 +55,6 @@
                 </td>
                 <td>{{user.created}}</td>
                 <td>{{user.recognitionId}}</td>
-
               </tr>
             </tbody>
           </table>

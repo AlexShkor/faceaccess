@@ -3,7 +3,6 @@
     <div class="tile is-ancestor">
       <div class="tile is-parent is-6">
         <article class="tile is-child box">
-          <h4 class="title">Upload Photos</h4>
           <div class="content">
             <div>Пользователь {{ $route.params.id }}</div>
             <div>Имя {{ currentName }}</div>
