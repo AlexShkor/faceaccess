@@ -4,10 +4,10 @@ const device = state => state.app.device
 const sidebar = state => state.app.sidebar
 const effect = state => state.app.effect
 const menuitems = state => state.menu.items
-const menueitemforuser = state => state.menu.itemsForUser
 const componententry = state => {
   return state.menu.items.filter(c => c.meta && c.meta.label === 'Components')[0]
 }
+
 
 export {
   pkg,
@@ -16,6 +16,5 @@ export {
   sidebar,
   effect,
   menuitems,
-  menueitemforuser,
-  componententry
+  componententry,
 }

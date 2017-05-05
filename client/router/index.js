@@ -23,8 +23,16 @@ export default new Router({
               icon: 'fa-user',
               isRequiresAuth: true
           },
-          component: require('../views/userProfile')
+          component: require('../views/userProfile/addFaces')
       },
+            {
+                name: 'Profile',
+                path: '/userProfile/profile/:id',
+                meta: {
+                    isRequiresAuth: true
+                },
+                component: require('../views/userProfile/profile')
+            },
       {
           name: 'Login',
           path: '/login',

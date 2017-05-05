@@ -29,7 +29,10 @@ router.beforeEach((route, redirect, next) => {
   if (route.meta.isRequiresAuth) {
       if (localStorage.getItem('UserId') == null) {         
           next({ name: 'Login' });
-      } else {
+      } 
+      if (localStorage.getItem('IsAdmin') == "false" && route.meta.isAdmin) {
+          next({ name: 'Home' });
+      }else {
           next();
       }
   } else {

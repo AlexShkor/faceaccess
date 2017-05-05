@@ -54,12 +54,9 @@ export default {
     show: Boolean
   },
   mounted() {
-      if(localStorage.getItem('IsAdmin') =="false" | localStorage.getItem('IsAdmin') =="true"){
+      if(localStorage.getItem('UserId') != null){
        this.isAuth = true;
-       }
-      if(localStorage.getItem('IsAdmin') == null){
-       this.isAuth = false;
-       }
+       }     
     },
   computed: mapGetters({
     pkginfo: 'pkg',

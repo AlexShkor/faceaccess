@@ -1,15 +1,14 @@
 import lazyLoading from './lazyLoading'
 
 export default {
-  name: 'Tables',
-  meta: {
+name: 'Tables',
+    meta: {
     icon: 'fa-table',
     expanded: false,
     isRequiresAuth: true
-  },
-
-  children: [
-    {
+    },
+children: [
+  {
       name: 'BasicTables',
       path: '/tables/basic',
       meta: {
@@ -17,6 +16,6 @@ export default {
           isRequiresAuth: true
       },
       component: lazyLoading('tables/Basic')
-    }
-  ]
+  }
+]
 }

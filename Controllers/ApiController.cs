@@ -17,13 +17,11 @@ namespace VueJsAspNetCoreSample.Controllers {
     public class UsersController : Controller {
         private MongoDatabase _db;
         private IFaceServiceClient _faceClient = new FaceServiceClient ("ae10dbb146c749ce8810068d9b83a868");
-        private readonly UserManager<IdentityUser> _userManager;
 
         const string _personGroupKey = "paralect";
 
-        public UsersController (MongoDatabase db, UserManager<IdentityUser> userManager) {
+        public UsersController (MongoDatabase db) {
             _db = db;
-            _userManager = userManager;
         }
         [Authorize(Roles = "ADMIN")]
         [HttpGet]
@@ -78,13 +76,14 @@ namespace VueJsAspNetCoreSample.Controllers {
 
         [Route("{photoId}/deletePhoto")]
         [HttpGet]
-        public IActionResult DeletePhoto(string photoId)
+        public async Task<IActionResult> DeletePhoto(string photoId)
         {
-            var cursor = _db.Faces.FindOneAndDelete(Builders<FaceDocument>.Filter.Eq(x => x.Id, photoId));
+            var cursor = _db.Faces.FindOneAndDelete(Builders<FaceDocument>.Filter.Eq(x => x.Id, photoId));             
             if (cursor == null)
             {
                 return this.Json(BadRequest());
             }
+            await _faceClient.DeletePersonFaceAsync(_personGroupKey, cursor.PersonId, cursor.PersistedFaceId);       
             return this.Json(Ok());
         }
 

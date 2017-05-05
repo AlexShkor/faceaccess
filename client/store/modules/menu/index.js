@@ -1,6 +1,7 @@
 import * as types from '../../mutation-types'
 import lazyLoading from './lazyLoading'
 import tables from './tables'
+import userProfile from './userProfile'
 
 // show: meta.label -> name
 // name: component name
@@ -13,7 +14,7 @@ const state = {
       path: '/dashboard',
       meta: {
           icon: 'fa-tachometer',
-          isRequiresAuth: true
+          isRequiresAuth: true          
       },
       component: lazyLoading('dashboard', true)
     },
@@ -22,7 +23,8 @@ const state = {
       path: '/users',
       meta: {
           icon: 'fa-users',
-          isRequiresAuth: true
+          isRequiresAuth: true,
+          isAdmin: true
       },
       component: lazyLoading('users', true)
     },
@@ -35,37 +37,8 @@ const state = {
       },
       component: lazyLoading('testing', true)
     },
+    userProfile,
     tables
-  ],
-  itemsForUser: [
-  {
-      name: 'Dashboard',
-      path: '/dashboard',
-      meta: {
-          icon: 'fa-tachometer',
-          isRequiresAuth: true
-      },
-      component: lazyLoading('dashboard', true)
-  },
-  {
-      name: 'User profile',
-      path: '/users/'+localStorage.getItem('UserId'),
-      meta: {
-          icon: 'fa fa-user-circle-o',
-          isRequiresAuth: true
-      },
-      component: lazyLoading('../views/userProfile', true)
-  },
-  {
-      name: 'Testing',
-      path: '/testing',
-      meta: {
-          icon: 'fa-rocket',
-          isRequiresAuth: true
-      },
-      component: lazyLoading('testing', true)
-  },
-  tables
   ]
 }
 
@@ -78,6 +51,7 @@ const mutations = {
     } else if (menuItem.item && 'expanded' in menuItem.item.meta) {
       menuItem.item.meta.expanded = menuItem.expanded
     }
+
   }
 }
 

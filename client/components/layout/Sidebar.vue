@@ -4,31 +4,33 @@
       General
     </p>
     <ul class="menu-list">
-      <li v-for="(item, index) in menu">
-        <router-link :to="item.path" :exact="true" :aria-expanded="isExpanded(item) ? 'true' : 'false'" v-if="item.path" @click.native="toggle(index, item)">
-          <span class="icon is-small"><i :class="['fa', item.meta.icon]"></i></span>
-          {{ item.meta.label || item.name }}
-          <span class="icon is-small is-angle" v-if="item.children && item.children.length">
-            <i class="fa fa-angle-down"></i>
-          </span>
-        </router-link>
-        <a :aria-expanded="isExpanded(item)" v-else @click="toggle(index, item)">
-          <span class="icon is-small"><i :class="['fa', item.meta.icon]"></i></span>
-          {{ item.meta.label || item.name }}
-          <span class="icon is-small is-angle" v-if="item.children && item.children.length">
-            <i class="fa fa-angle-down"></i>
-          </span>
-        </a>
-
-        <expanding v-if="item.children && item.children.length">
-          <ul v-show="isExpanded(item)">
-            <li v-for="subItem in item.children" v-if="subItem.path">
-              <router-link :to="generatePath(item, subItem)">
-                {{ subItem.meta && subItem.meta.label || subItem.name }}
+      <li v-for="(item, index) in menu" >
+          <div v-if="item.meta.isAdmin == isAdmin | item.meta.isAdmin == null">
+              <router-link :to="item.path" :exact="true" :aria-expanded="isExpanded(item) ? 'true' : 'false'" v-if="item.path" @click.native="toggle(index, item)">
+                  <span class="icon is-small"><i :class="['fa', item.meta.icon]"></i></span>
+                  {{ item.meta.label || item.name }}
+                  <span class="icon is-small is-angle" v-if="item.children && item.children.length">
+                      <i class="fa fa-angle-down"></i>
+                  </span>
               </router-link>
-            </li>
-          </ul>
-        </expanding>
+              <a :aria-expanded="isExpanded(item)" v-else @click="toggle(index, item)">
+                  <span class="icon is-small"><i :class="['fa', item.meta.icon]"></i></span>
+                  {{ item.meta.label || item.name }}
+                  <span class="icon is-small is-angle" v-if="item.children && item.children.length">
+                      <i class="fa fa-angle-down"></i>
+                  </span>
+              </a>
+
+              <expanding v-if="item.children && item.children.length">
+                  <ul v-show="isExpanded(item)">
+                      <li v-for="subItem in item.children" v-if="subItem.path">
+                          <router-link :to="generatePath(item, subItem)">
+                              {{ subItem.meta && subItem.meta.label || subItem.name }}
+                          </router-link>
+                      </li>
+                  </ul>
+              </expanding>
+          </div>
       </li>
     </ul>
   </aside>
@@ -48,7 +50,8 @@ export default {
   data () {
     return {
       isReady: false,
-      isAuth: false
+      isAuth: false,
+      isAdmin: false
     }
   }, 
   mounted () {
@@ -57,16 +60,16 @@ export default {
       this.isReady = true
       this.shouldExpandMatchItem(route)
     }
-    if(localStorage.getItem('IsAdmin')=="false" | localStorage.getItem('IsAdmin')=="true"){
+    if(localStorage.getItem('UserId') != null){
        this.isAuth = true;
        }
-      if(localStorage.getItem('IsAdmin')== null){
-       this.isAuth = false;
-       }
+    if(localStorage.getItem('IsAdmin') == "true"){
+        this.isAdmin = true;
+    }
   },
 
     computed:{            
-        ...mapGetters({menu: localStorage.getItem('IsAdmin') =="true" ? 'menuitems' : 'menueitemforuser'})      
+        ...mapGetters({menu: 'menuitems'})      
     },
 
   methods: {
