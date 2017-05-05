@@ -57,16 +57,16 @@ export default {
       this.isReady = true
       this.shouldExpandMatchItem(route)
     }
-    if(localStorage.getItem('IsAdmin')==="false" | localStorage.getItem('IsAdmin')==="true"){
+    if(localStorage.getItem('IsAdmin')=="false" | localStorage.getItem('IsAdmin')=="true"){
        this.isAuth = true;
        }
-      if(localStorage.getItem('IsAdmin')=== undefined){
+      if(localStorage.getItem('IsAdmin')== null){
        this.isAuth = false;
        }
   },
 
     computed:{            
-        ...mapGetters({menu: localStorage.getItem('IsAdmin')==="true" ? 'menuitems' : 'menueitemforuser'})      
+        ...mapGetters({menu: localStorage.getItem('IsAdmin') =="true" ? 'menuitems' : 'menueitemforuser'})      
     },
 
   methods: {

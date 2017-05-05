@@ -54,10 +54,10 @@ export default {
     show: Boolean
   },
   mounted() {
-      if(localStorage.getItem('IsAdmin')==="false" | localStorage.getItem('IsAdmin')==="true"){
+      if(localStorage.getItem('IsAdmin') =="false" | localStorage.getItem('IsAdmin') =="true"){
        this.isAuth = true;
        }
-      if(localStorage.getItem('IsAdmin')=== undefined){
+      if(localStorage.getItem('IsAdmin') == null){
        this.isAuth = false;
        }
     },
