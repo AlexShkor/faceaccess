@@ -22,10 +22,13 @@ export default {
   loadImages(userId){
       return DataService.get('api/users/{userid}/faces');
   },
-  train(){
-      return DataService.post('api/users/train', {})
+  train() {
+      return DataService.post('api/users/train', {});
   },
-  identify(faceId){
-      return DataService.post('api/users/identify', {faceId: faceId})
+  identify(faceId) {
+      return DataService.post('api/users/identify', { faceId: faceId });
+  },
+  deletePhoto(photoId) {
+      return DataService.get("api/users/" + photoId + "/deletePhoto");
   }
 }

@@ -1,61 +1,53 @@
 <template>
-  <div>
-    <div class="tile is-ancestor">
-      <div class="tile is-parent is-6">
-        <article class="tile is-child box">
-          <h4 class="title">Add Faces</h4>
-          <div class="content">
-            <div>Пользователь {{ $route.params.id }}</div>
-            <div>Имя {{ currentName }}</div>
-            <div>currentFaceId {{ currentFaceId }}</div>
-            <img id='img' :src="currentPhoto" alt="" style="width:400px;height:300px" />
-            <canvas id="canvas" width="400" height="300"></canvas>
-            <div class="block">
-              <button class="button is-primary" @click='takePhoto'>Take Photo</button>
-              <button class="button is-success" @click='upload'>Upload Current</button>
-              <button class="button" @click='detect'>Detect</button>
-              <button class="button" @click='train'>Train</button>
-              <button class="button is-danger" @click='identify'>Identify</button>
+    <div>
+        <div class="tile is-ancestor">
+            <div class="tile is-parent is-6">
+                <article class="tile is-child box">
+                    <h4 class="title">Add Faces</h4>
+                    <div class="content">
+                        <div>Пользователь {{ $route.params.id }}</div>
+                        <div>Имя {{ currentName }}</div>
+                        <div>currentFaceId {{ currentFaceId }}</div>
+                        <img id='img' :src="currentPhoto" alt="" style="width:400px;height:300px" />
+                        <canvas id="canvas" width="400" height="300"></canvas>
+                        <div class="block">
+                            <button class="button is-primary" @click='takePhoto'>Take Photo</button>
+                            <button class="button is-success" @click='upload'>Upload Current</button>
+                            <button class="button" @click='detect'>Detect</button>
+                            <button class="button" @click='train'>Train</button>
+                            <button class="button is-danger" @click='identify'>Identify</button>
+                        </div>
+                    </div>
+                </article>
             </div>
-          </div>
-        </article>
-      </div>
-      <div class="tile is-parent is-6">
-        <article class="tile is-child box">
-          <h4 class="title"></h4>
-          <div class="content">
-            <vue-webcam ref='webcam'></vue-webcam>
-          </div>
-        </article>
-      </div>
-    </div>
-    <div class="columns is-multiline">
-      <div v-for='(photo, index) in photos' class=" column is-one-quarter ">
-        <div>
-
-         <a class="level-item">
-                <span class="icon is-small">#{{index +1}} </span>
-              </a>
-
-           <nav class="level">
-            <div class="level-left">
-
-
-              <a class="level-item">
-                <span class="icon is-small"><i class="fa fa-heart"></i></span>
-
-              </a>
-               <a class="level-item" title="Delete">
-                <span @click='deleteFace' class="icon is-small"><i class="fa fa-trash"></i></span>
-              </a>
+            <div class="tile is-parent is-6">
+                <article class="tile is-child box">
+                    <h4 class="title"></h4>
+                    <div class="content">
+                        <vue-webcam ref='webcam'></vue-webcam>
+                    </div>
+                </article>
             </div>
-          </nav>
-          <div></div>
         </div>
-        <img class="box" v-title="photo.id" :src='photo.img || photo.imageBase64' />
-      </div>
+        <div class="columns is-multiline">
+            <div v-for='(photo, index) in photos' class="column is-one-quarter">
+                <div>
+                    <a class="level-item">
+                        <span class="icon is-small">#{{index +1}} </span>
+                    </a>
+                    <nav class="level">
+                        <div class="level-left">
+                            <a class="level-item" title="Delete" @click='deleteFace(index, photo.id)'>
+                                <span  class="icon is-small"><i class="fa fa-trash"></i></span>
+                            </a>
+                        </div>
+                    </nav>
+                    <div></div>
+                </div>
+                <img class="box" :title="photo.id" :src='photo.img || photo.imageBase64' />
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -145,6 +137,13 @@
         usersDs.identify(this.currentFaceId).then((res) => {
           this.currentName = res.data.name;
         });
+      },
+      deleteFace(index ,photoId){
+          usersDs.deletePhoto(photoId).then((response) => {
+              if(response.data.statusCode === 200){
+                  this.photos.splice(index, 1);
+              }           
+          });
       }
     }
   }

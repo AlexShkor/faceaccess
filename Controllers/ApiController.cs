@@ -72,8 +72,20 @@ namespace VueJsAspNetCoreSample.Controllers {
                     PersistedFaceId = result.PersistedFaceId,
                     Created = DateTime.Now
             };
-            _db.Faces.InsertOneAsync (face);
+            await _db.Faces.InsertOneAsync(face);            
             return this.Json (doc);
+        }
+
+        [Route("{photoId}/deletePhoto")]
+        [HttpGet]
+        public IActionResult DeletePhoto(string photoId)
+        {
+            var cursor = _db.Faces.FindOneAndDelete(Builders<FaceDocument>.Filter.Eq(x => x.Id, photoId));
+            if (cursor == null)
+            {
+                return this.Json(BadRequest());
+            }
+            return this.Json(Ok());
         }
 
         [Route ("detect")]
