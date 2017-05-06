@@ -35,7 +35,7 @@
   "dependencies": {
     "animate.css": "3.5.2",
     "animejs": "^2.0.1",
-    "aspnet-webpack": "^1.0.28",
+    "aspnet-webpack": "^1.0.29",
     "axios": "^0.15.3",
     "bulma": "^0.3.2",
     "font-awesome": "4.7.0",
@@ -93,7 +93,7 @@
     "eslint-plugin-standard": "^2.1.1",
     "eventsource-polyfill": "^0.9.6",
     "express": "^4.15.0",
-    "extract-text-webpack-plugin": "^2.0.0-beta.4",
+    "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.10.1",
     "html-webpack-plugin": "^2.25.0",
     "http-proxy-middleware": "^0.17.4",
