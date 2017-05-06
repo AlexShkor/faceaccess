@@ -104,8 +104,10 @@ namespace VueJsAspNetCoreSample.Controllers {
 
         [Route ("check")]
         [HttpPost]
-        public async Task<IActionResult> Check () {
-            var faceDetect = await _faceClient.DetectAsync(this.Request.Body);
+        public async Task<IActionResult> Check ([FromBody] FaceUploadModel model) {
+            var bytes = Convert.FromBase64String (model.Photo);
+            var memoryStream = new MemoryStream (bytes);
+            var faceDetect = await _faceClient.DetectAsync(memoryStream);
             var identity = await _faceClient.IdentifyAsync(_personGroupKey,new[]{faceDetect[0].FaceId});
             var result = identity.FirstOrDefault()?.Candidates.FirstOrDefault() ?? new Candidate();
             var response = new CheckResponse {
