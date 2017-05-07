@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using VueJsAspNetCoreSample.Documents;
+using VueJsAspNetCoreSample.Middleware;
 
 namespace VueJsAspNetCoreSample {
     public class Startup {
@@ -43,10 +44,7 @@ namespace VueJsAspNetCoreSample {
             loggerFactory.AddDebug ();
 
             if (env.IsDevelopment ()) {
-                app.UseDeveloperExceptionPage ();
                 app.UseWebpackDevMiddleware (new WebpackDevMiddlewareOptions () { HotModuleReplacement = true });
-            } else {
-                app.UseExceptionHandler ("/Home/Error");
             }
 
             app.UseDefaultFiles ();
@@ -67,6 +65,7 @@ namespace VueJsAspNetCoreSample {
                     await next();
                 });
             });
+            app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseMvc (routes => {
                 routes.MapRoute (
                     name: "default",
