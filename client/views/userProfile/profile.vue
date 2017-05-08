@@ -21,7 +21,7 @@
                             </div>
                             <div v-else>
                                 <button class="button is-danger" @click="removeImage">Remove image</button>
-                                <button class="button is-success" @click='upload'>Upload Current</button>
+                                <button class="button is-success" @click='upload' :disabled="isUploadPhoto">Upload Current</button>
                             </div>
                         </div>                
                 </article>
@@ -37,13 +37,15 @@
     data() {
         return {
             image: '',
-            message:''
+            message:'',
+            isUploadPhoto: false
       }
     },
      mounted(){
          accountDs.getUserAvatar(this.$route.params.id).then((res)=>{
              if(res.data.statusCode != 400){
                  this.image = res.data;
+                 this.isUploadPhoto = true;
              }else{
                  this.image ="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&f=y"
              }
@@ -72,13 +74,15 @@
             accountDs.deleteUserAvatar(this.$route.params.id, '').then((res) => {
                 if(res.data.statusCode === 200){
                     this.image = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&f=y';
+                    this.isUploadPhoto = false;
                 }
             })       
         },
         upload(){
             accountDs.addUserAvatar(this.$route.params.id, this.image.toString('base64')).then((res) => {
                 if(res.data.statusCode === 200){
-                    this.message = "Avatar successfully loaded"
+                    this.message = "Avatar successfully loaded";
+                    this.isUploadPhoto = true;
                 }
             })
         },
