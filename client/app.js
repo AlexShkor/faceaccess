@@ -30,18 +30,16 @@ router.beforeEach((route, redirect, next) => {
       if (localStorage.getItem('UserId') == null) {         
           next({ name: 'Login' });
       } 
-      if (localStorage.getItem('IsAdmin') == "false" && route.meta.isAdmin) {
-          next({ name: 'Home' });
+      else if(localStorage.getItem('IsAdmin') == "false" && route.meta.isAdmin) {
+          next({ name: 'Dashboard' });
       }else {
           next();
       }
+  } else if (localStorage.getItem('UserId') == null) {
+      next();
   } else {
-      if (localStorage.getItem('UserId') != null) {
-          next({ name: 'Home' });
-      } else {
-          next();
-      }     
-  }    
+      next({ name: 'Dashboard' });
+  }   
 })
 
 Object.keys(filters).forEach(key => {
