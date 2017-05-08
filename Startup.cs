@@ -15,6 +15,7 @@ using VueJsAspNetCoreSample.Documents;
 using VueJsAspNetCoreSample.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
+using Microsoft.ProjectOxford.Face;
 
 namespace VueJsAspNetCoreSample {
     public class Startup {
@@ -43,6 +44,7 @@ namespace VueJsAspNetCoreSample {
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
             services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSingleton<IFaceServiceClient>(new FaceServiceClient(Configuration["FaceClient:SubscriptionKey"]));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

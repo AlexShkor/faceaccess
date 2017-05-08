@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.ProjectOxford.Face;
 using Microsoft.ProjectOxford.Face.Contract;
 using MongoDB.Bson;
@@ -16,12 +17,13 @@ namespace VueJsAspNetCoreSample.Controllers {
     [Route ("api/[controller]")]
     public class UsersController : Controller {
         private MongoDatabase _db;
-        private IFaceServiceClient _faceClient = new FaceServiceClient ("ae10dbb146c749ce8810068d9b83a868");
+        private IFaceServiceClient _faceClient;
+        private IConfiguration _configuration;   
 
-        const string _personGroupKey = "paralect";
-
-        public UsersController (MongoDatabase db) {
+        public UsersController (MongoDatabase db, IConfiguration configuration, IFaceServiceClient faceClient) {
             _db = db;
+            _configuration = configuration;
+            _faceClient = faceClient;
         }
         [Authorize(Roles = "ADMIN")]
         [HttpGet]
@@ -33,7 +35,7 @@ namespace VueJsAspNetCoreSample.Controllers {
         [HttpGet]
         public IActionResult Faces (string userId) {
             return this.Json (_db.Faces.AsQueryable ().Where (x => x.UserId == userId).ToList ().Select (x => {
-                x.ImageBase64 = _imgPrefix + x.ImageBase64;
+                x.ImageBase64 = _configuration["FaceClient:ImgPrefix"] + x.ImageBase64;
                 return x;
             }));
         }
@@ -51,17 +53,16 @@ namespace VueJsAspNetCoreSample.Controllers {
             public string Photo { get; set; }
         }
 
-        private const string _imgPrefix = "data:image/jpeg;base64,";
-
         [Route ("faces")]
         [HttpPost]
         public async Task<IActionResult> AddFace ([FromBody] FaceUploadModel model) {
             var cursor = await _db.Persons.FindAsync (Builders<PersonDocument>.Filter.Eq (x => x.Id, model.UserID));
             var doc = await cursor.FirstAsync ();
-            var photo = model.Photo.Substring (_imgPrefix.Length);
+            var photo = model.Photo.Substring (_configuration["FaceClient:ImgPrefix"].Length);
             var bytes = Convert.FromBase64String (photo);
             var memoryStream = new MemoryStream (bytes);
-            var result = await _faceClient.AddPersonFaceAsync (_personGroupKey, doc.PersonId, memoryStream /*, null, targetFace */ );
+            var result = await _faceClient.AddPersonFaceAsync (_configuration["FaceClient:PersonGroupKey"], doc.PersonId, memoryStream /*, null, targetFace */ );
+
             var face = new FaceDocument () {
                 Id = ObjectId.GenerateNewId ().ToString (),
                     UserId = doc.Id,
@@ -70,8 +71,8 @@ namespace VueJsAspNetCoreSample.Controllers {
                     PersistedFaceId = result.PersistedFaceId,
                     Created = DateTime.Now
             };
-            await _db.Faces.InsertOneAsync(face);            
-            return this.Json (doc);
+            await _db.Faces.InsertOneAsync(face);
+            return this.Json (face);
         }
 
         [Route("{photoId}/deletePhoto")]
@@ -83,7 +84,7 @@ namespace VueJsAspNetCoreSample.Controllers {
             {
                 return this.Json(BadRequest());
             }
-            await _faceClient.DeletePersonFaceAsync(_personGroupKey, cursor.PersonId, cursor.PersistedFaceId);       
+            await _faceClient.DeletePersonFaceAsync(_configuration["FaceClient:PersonGroupKey"], cursor.PersonId, cursor.PersistedFaceId);       
             return this.Json(Ok());
         }
 
@@ -93,7 +94,7 @@ namespace VueJsAspNetCoreSample.Controllers {
             //var faceDetect = await _faceClient.DetectAsync(this.Request.Body,true,true);
             //var targetFace = faceDetect.First().FaceRectangle;
             //this.Request.Body.Seek(0, SeekOrigin.Begin);
-            var photo = model.Photo.Substring (_imgPrefix.Length);
+            var photo = model.Photo.Substring (_configuration["FaceClient:ImgPrefix"].Length);
             var bytes = Convert.FromBase64String (photo);
 
             var memoryStream = new MemoryStream (bytes);
@@ -103,7 +104,7 @@ namespace VueJsAspNetCoreSample.Controllers {
                 FaceId = face.FaceId,
                     Rect = face.FaceRectangle,
                     Landmarks = face.FaceLandmarks
-            });;
+            });
         }
 
         private const double ConfidenceTreshold = 0.8;
@@ -112,7 +113,7 @@ namespace VueJsAspNetCoreSample.Controllers {
         [HttpPost]
         public async Task<IActionResult> Check () {
             var faceDetect = await _faceClient.DetectAsync(this.Request.Body);
-            var identity = await _faceClient.IdentifyAsync(_personGroupKey,new[]{faceDetect[0].FaceId});
+            var identity = await _faceClient.IdentifyAsync(_configuration["FaceClient:PersonGroupKey"], new[]{faceDetect[0].FaceId});
             var result = identity.FirstOrDefault()?.Candidates.FirstOrDefault() ?? new Candidate();
             var response = new CheckResponse {
               Access = false,
@@ -125,7 +126,7 @@ namespace VueJsAspNetCoreSample.Controllers {
               var doc = _db.Persons.AsQueryable ().Where (x => x.PersonId == response.PersonId).FirstOrDefault ();
               response.Name = doc.Name;
             }
-            if (response.Confidence >= ConfidenceTreshold)
+            if (response.Confidence >= Convert.ToDouble(_configuration["FaceClient:ConfidenceTreshold"]))
             {
               response.Access = true;
             }
@@ -135,7 +136,7 @@ namespace VueJsAspNetCoreSample.Controllers {
         [Route ("train")]
         [HttpPost]
         public async Task<IActionResult> Train () {
-            await _faceClient.TrainPersonGroupAsync (_personGroupKey);
+            await _faceClient.TrainPersonGroupAsync (_configuration["FaceClient:PersonGroupKey"]);
             return this.Ok ();
         }
 
@@ -146,7 +147,7 @@ namespace VueJsAspNetCoreSample.Controllers {
         [Route ("identify")]
         [HttpPost]
         public async Task<IActionResult> Identify ([FromBody] IdentifyRequest request) {
-            var result = await _faceClient.IdentifyAsync (_personGroupKey, new [] { request.FaceId });
+            var result = await _faceClient.IdentifyAsync (_configuration["FaceClient:PersonGroupKey"], new [] { request.FaceId });
             var doc = _db.Persons.AsQueryable ().Where (x => x.PersonId == result[0].Candidates[0].PersonId).FirstOrDefault ();
             return this.Json (doc);
         }

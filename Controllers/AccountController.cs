@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.ProjectOxford.Face;
 using VueJsAspNetCoreSample.Documents;
@@ -24,22 +25,26 @@ namespace VueJsAspNetCoreSample.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
-        private IFaceServiceClient _faceClient = new FaceServiceClient("ae10dbb146c749ce8810068d9b83a868");
-        const string _personGroupKey = "paralect";
+        private IFaceServiceClient _faceClient;
         private MongoDatabase _db;
+        private IConfiguration _configuration;
 
         public AccountController(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             IEmailSender emailSender,
             ILoggerFactory loggerFactory,
-            MongoDatabase db)
+            MongoDatabase db,
+            IConfiguration configuration,
+            IFaceServiceClient faceClient)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = loggerFactory.CreateLogger<AccountController>();
             _db = db;
+            _configuration = configuration;
+            _faceClient = faceClient;
         }
 
         [HttpPost]
@@ -130,7 +135,7 @@ namespace VueJsAspNetCoreSample.Controllers
         private async Task CreatePerson(string id, string name)
         {
             PersonDocument doc = new PersonDocument();
-            var data = _faceClient.CreatePersonAsync(_personGroupKey, name);
+            var data = _faceClient.CreatePersonAsync(_configuration["FaceClient:PersonGroupKey"], name);
             doc.PersonId = data.Result.PersonId;
             doc.Created = DateTime.Now;
             doc.Id = id;
