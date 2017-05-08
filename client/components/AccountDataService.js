@@ -15,5 +15,14 @@ export default {
   },
   logOff(){
       return DataService.post("account/logOff",{})
-  }
+  },
+  addUserAvatar(userId, photo) {
+      return DataService.post("account/addUserAvatar", {USerId:userId, Photo:photo});
+  },
+deleteUserAvatar(userId, photo) {
+      return DataService.post("account/deleteUserAvatar", {USerId:userId, Photo:photo});
+},
+getUserAvatar(userId) {
+    return DataService.post("account/getUserAvatar", {UserId:userId});
+}
 }

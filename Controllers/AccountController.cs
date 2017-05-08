@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.ProjectOxford.Face;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using VueJsAspNetCoreSample.Documents;
 using VueJsAspNetCoreSample.Models.AccountViewModels;
 using VueJsAspNetCoreSample.Services;
@@ -131,6 +133,51 @@ namespace VueJsAspNetCoreSample.Controllers
             }
             return this.Json(BadRequest(result.Errors));
         }
+   
+        [HttpPost]
+        public IActionResult GetUserAvatar([FromBody] UserInfo user)
+        {
+            if (user.UserId != null)
+            {
+                var imageBase64 = _db.Persons.AsQueryable().First(x => x.Id == user.UserId).Photo;
+                if (imageBase64 != "")
+                {
+                    var avatarUser = _configuration["FaceClient:ImgPrefix"] + imageBase64;
+                    return this.Json(avatarUser);
+                }
+                return this.Json(BadRequest());
+            }
+            return this.Json(BadRequest());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddUserAvatar([FromBody] UserAvatar userAvatar)
+        {
+            var photo = userAvatar.Photo.Substring(_configuration["FaceClient:ImgPrefix"].Length);
+            var filter = Builders<PersonDocument>.Filter.Eq(x => x.Id, userAvatar.UserId);
+            var update = Builders<PersonDocument>.Update.Set("Photo", photo);
+
+            var result = await _db.Persons.UpdateOneAsync(filter, update);
+            if (result != null)
+            {
+                return this.Json(Ok());
+            }
+            return this.Json(BadRequest());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUserAvatar([FromBody] UserAvatar userAvatar)
+        {
+            var filter = Builders<PersonDocument>.Filter.Eq(x => x.Id, userAvatar.UserId);
+            var update = Builders<PersonDocument>.Update.Set("Photo", userAvatar.Photo);
+
+            var result = await _db.Persons.UpdateOneAsync(filter, update);
+            if (result != null)
+            {
+                return this.Json(Ok());
+            }
+            return this.Json(BadRequest());
+        }
 
         private async Task CreatePerson(string id, string name)
         {
@@ -141,6 +188,11 @@ namespace VueJsAspNetCoreSample.Controllers
             doc.Id = id;
             doc.Name = name;
             await _db.Persons.InsertOneAsync(doc);
+        }
+
+        public class UserInfo
+        {
+            public string UserId { get; set; }
         }
     }
 }
