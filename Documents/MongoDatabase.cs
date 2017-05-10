@@ -1,4 +1,5 @@
 using MongoDB.Driver;
+using VueJsAspNetCoreSample.Models.AccountViewModels;
 
 namespace VueJsAspNetCoreSample.Documents {
     public class MongoDatabase {
@@ -10,6 +11,8 @@ namespace VueJsAspNetCoreSample.Documents {
             public const string Persons = "persons";
 
             public const string Faces = "faces";
+
+            public const string AvatarDefault = "avatarDefault";
         }
         public MongoDatabase (string connectionString) {
            var settings = MongoClientSettings.FromUrl(new MongoUrl(connectionString));
@@ -24,5 +27,9 @@ namespace VueJsAspNetCoreSample.Documents {
         public IMongoCollection<FaceDocument> Faces {
             get { return _db.GetCollection<FaceDocument> (Collections.Faces); }
         }
+
+        public IMongoCollection<AvatarDefault> AvatarDefault{
+            get { return _db.GetCollection<AvatarDefault>(Collections.AvatarDefault); }
+        } 
     }
 }

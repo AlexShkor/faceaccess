@@ -151,12 +151,23 @@ namespace VueJsAspNetCoreSample.Controllers
         }
 
         [HttpPost]
+        public IActionResult GetAvatarDefault()
+        {
+            var imageBase64 = _db.AvatarDefault.AsQueryable().First().Photo;
+            if (imageBase64 != "")
+            {
+                var avatarDefault = _configuration["FaceClient:ImgPrefix"] + imageBase64;
+                return this.Json(avatarDefault);
+            }
+            return this.Json(BadRequest());
+        }
+
+        [HttpPost]
         public async Task<IActionResult> AddUserAvatar([FromBody] UserAvatar userAvatar)
         {
             var photo = userAvatar.Photo.Substring(_configuration["FaceClient:ImgPrefix"].Length);
             var filter = Builders<PersonDocument>.Filter.Eq(x => x.Id, userAvatar.UserId);
             var update = Builders<PersonDocument>.Update.Set("Photo", photo);
-
             var result = await _db.Persons.UpdateOneAsync(filter, update);
             if (result != null)
             {

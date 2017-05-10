@@ -11,7 +11,7 @@
                             </a>
                             <img :src="image" style="width:auto;height:300px;border:ridge" />
                         </div>
-                            <div v-if="image == 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&f=y'">
+                            <div v-if="isSelectedPhotos == false">
                                 <a>
                                     <span class="fileContainer">
                                         Update avatar!
@@ -38,7 +38,8 @@
         return {
             image: '',
             message:'',
-            isUploadPhoto: false
+            isUploadPhoto: false,
+            isSelectedPhotos: false,
       }
     },
      mounted(){
@@ -46,11 +47,12 @@
              if(res.data.statusCode != 400){
                  this.image = res.data;
                  this.isUploadPhoto = true;
+                 this.isSelectedPhotos = true;
              }else{
-                 this.image ="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&f=y"
-             }
-             
-             
+                 accountDs.getAvatarDefault().then((res) => {
+                     this.image = res.data;
+                 })                 
+             }                         
         })
     },
     methods: {
@@ -67,14 +69,19 @@
 
             reader.onload = (e) => {
                 this.image = e.target.result;
+                this.isSelectedPhotos = true;
+                this.isUploadPhoto = false;
             };
             reader.readAsDataURL(file);
         },
         removeImage(){
             accountDs.deleteUserAvatar(this.$route.params.id, '').then((res) => {
                 if(res.data.statusCode === 200){
-                    this.image = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&f=y';
-                    this.isUploadPhoto = false;
+                    accountDs.getAvatarDefault().then((res) => {
+                        this.image = res.data;
+                        this.isUploadPhoto = false;
+                        this.isSelectedPhotos = false;
+                    })
                 }
             })       
         },

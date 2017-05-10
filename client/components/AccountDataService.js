@@ -24,5 +24,8 @@ deleteUserAvatar(userId, photo) {
 },
 getUserAvatar(userId) {
     return DataService.post("account/getUserAvatar", {UserId:userId});
+},
+getAvatarDefault() {
+    return DataService.post("account/getAvatarDefault", {});
 }
 }
