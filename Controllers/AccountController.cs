@@ -113,7 +113,26 @@ namespace VueJsAspNetCoreSample.Controllers
             }
             return this.Json(BadRequest("Invalid email"));
         }
-
+        [HttpPost]
+        public async Task<IActionResult> ChangePasswordFromUserProfile([FromBody]ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return this.Json(BadRequest("IsValid false"));
+            }
+            var user = await _userManager.FindByNameAsync(model.Email);
+            if (user == null)
+            {
+                return this.Json(BadRequest("User does not exist"));
+            }
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, code, model.NewPassword);
+            if (result.Succeeded)
+            {
+                return this.Json(Ok());
+            }
+            return this.Json(BadRequest(result.Errors));
+        }
         [HttpPost]
         public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordViewModel model)
         {
@@ -135,17 +154,22 @@ namespace VueJsAspNetCoreSample.Controllers
         }
    
         [HttpPost]
-        public IActionResult GetUserAvatar([FromBody] UserInfo user)
+        public IActionResult GetUser([FromBody] UserInfo user)
         {
             if (user.UserId != null)
             {
-                var imageBase64 = _db.Persons.AsQueryable().First(x => x.Id == user.UserId).Photo;
-                if (imageBase64 != "")
+                var userProfile = _db.Persons.AsQueryable().First(x => x.Id == user.UserId);
+
+                if (userProfile.Photo == "" | userProfile.Photo == null)
                 {
-                    var avatarUser = _configuration["FaceClient:ImgPrefix"] + imageBase64;
-                    return this.Json(avatarUser);
+                    var imageBase64 = _db.AvatarDefault.AsQueryable().First().Photo;
+                    userProfile.Photo = _configuration["FaceClient:ImgPrefix"] + imageBase64;
+                    return this.Json(userProfile);
                 }
-                return this.Json(BadRequest());
+                    var avatarUser = _configuration["FaceClient:ImgPrefix"] + userProfile.Photo;
+                    userProfile.Photo = avatarUser;
+                    userProfile.IsUploadPhoto = true;
+                    return this.Json(userProfile);                        
             }
             return this.Json(BadRequest());
         }
@@ -163,29 +187,18 @@ namespace VueJsAspNetCoreSample.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddUserAvatar([FromBody] UserAvatar userAvatar)
+        public async Task<IActionResult> UpdateUser([FromBody] PersonDocument user)
         {
-            var photo = userAvatar.Photo.Substring(_configuration["FaceClient:ImgPrefix"].Length);
-            var filter = Builders<PersonDocument>.Filter.Eq(x => x.Id, userAvatar.UserId);
-            var update = Builders<PersonDocument>.Update.Set("Photo", photo);
-            var result = await _db.Persons.UpdateOneAsync(filter, update);
-            if (result != null)
+            if (user.Photo != null)
             {
-                return this.Json(Ok());
+                var photo = user.Photo.Substring(_configuration["FaceClient:ImgPrefix"].Length);
+                user.Photo = photo;
             }
-            return this.Json(BadRequest());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> DeleteUserAvatar([FromBody] UserAvatar userAvatar)
-        {
-            var filter = Builders<PersonDocument>.Filter.Eq(x => x.Id, userAvatar.UserId);
-            var update = Builders<PersonDocument>.Update.Set("Photo", userAvatar.Photo);
-
-            var result = await _db.Persons.UpdateOneAsync(filter, update);
+            var filter = Builders<PersonDocument>.Filter.Eq(x => x.Id, user.Id);
+            var result = await _db.Persons.ReplaceOneAsync(filter, user);
             if (result != null)
             {
-                return this.Json(Ok());
+              return this.Json(Ok());  
             }
             return this.Json(BadRequest());
         }

@@ -27,8 +27,17 @@ namespace VueJsAspNetCoreSample.Controllers {
         }
         [Authorize(Roles = "ADMIN")]
         [HttpGet]
-        public IActionResult Users () {
-            return this.Json (_db.Persons.AsQueryable ());
+        public IActionResult Users ()
+        {
+            var users = _db.Persons.AsQueryable().ToList();
+            foreach (var user in users)
+            {
+                if (!string.IsNullOrEmpty(user.Photo))
+                {
+                    user.Photo = _configuration["FaceClient:ImgPrefix"] + user.Photo;
+                }
+            }
+            return this.Json (users);
         }
 
         [Route ("{userId}/faces")]

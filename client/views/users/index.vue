@@ -12,6 +12,7 @@
             <thead>
               <tr>
                 <th><abbr title="Position">#</abbr></th>
+                <th>Photo</th>
                 <th>Name</th>
                 <th>Created</th>
                 <th></th>
@@ -23,6 +24,8 @@
                 <th>
                  <span>{{index + 1}} </span>
                 </th>
+                  <td v-if="user.photo != null"><avatar :username="user.name" :size="50" :src="user.photo"></avatar></td>
+                  <td v-else><avatar :username="user.name" :size="50"></avatar></td>
                 <td>
                   <router-link :to="{ name: 'User', params: { id: user.id }}">{{user.name}}</router-link>
                 </td>
@@ -41,8 +44,12 @@
 <script>
   import usersDs from 'components/UsersDataService'
   import accountDs from 'components/AccountDataService'
+  import Avatar from 'vue-avatar/dist/Avatar' 
   
   export default {
+    components: {       
+        Avatar
+    },
     data() {
       return {
         userName: '',

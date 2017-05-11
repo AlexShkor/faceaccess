@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace VueJsAspNetCoreSample.Models.AccountViewModels
 {
-    public class UserAvatar
+    public class ChangePasswordViewModel
     {
-        public string UserId { get; set; }
-        public string Photo { get; set; }
+        public string Email { set; get; }
+        public string NewPassword { set; get; }
     }
 }

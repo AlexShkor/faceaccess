@@ -16,16 +16,17 @@ export default {
   logOff(){
       return DataService.post("account/logOff",{})
   },
-  addUserAvatar(userId, photo) {
-      return DataService.post("account/addUserAvatar", {USerId:userId, Photo:photo});
-  },
-deleteUserAvatar(userId, photo) {
-      return DataService.post("account/deleteUserAvatar", {USerId:userId, Photo:photo});
-},
-getUserAvatar(userId) {
-    return DataService.post("account/getUserAvatar", {UserId:userId});
+ 
+getUser(userId) {
+    return DataService.post("account/getUser", {UserId:userId});
 },
 getAvatarDefault() {
     return DataService.post("account/getAvatarDefault", {});
+},
+changePasswordFromUserProfile(email, newPassword) {
+    return DataService.post("account/changePasswordFromUserProfile", {Email:email, NewPassword:newPassword});
+},
+updateUser(id, photo, personId, fullName, created, isUploadPhoto) {
+    return DataService.post("account/updateUser", { Id: id, Photo: photo, PersonId: personId, Name: fullName, Created: created, IsUploadPhoto: isUploadPhoto });
 }
 }
