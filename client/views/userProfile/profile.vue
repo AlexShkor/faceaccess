@@ -46,13 +46,6 @@
                     </div>
                 </article>
             </div>
-            <div class="tile is-parent is-6" v-if="isRecognitionSetupPage">
-                <article class="tile is-child box" id="outer">
-                    <div id="inner">
-                        <h2>Recognition Setup</h2>
-                    </div>
-                </article>
-            </div>
             <div class="tile is-parent is-6" v-if="isRecognitionLogsPage">
                 <article class="tile is-child box" id="outer">
                     <div id="inner">

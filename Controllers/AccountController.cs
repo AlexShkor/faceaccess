@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -30,6 +32,7 @@ namespace VueJsAspNetCoreSample.Controllers
         private IFaceServiceClient _faceClient;
         private MongoDatabase _db;
         private IConfiguration _configuration;
+        private IPhotoCompressor _photoCompressor;
 
         public AccountController(
             UserManager<IdentityUser> userManager,
@@ -38,7 +41,8 @@ namespace VueJsAspNetCoreSample.Controllers
             ILoggerFactory loggerFactory,
             MongoDatabase db,
             IConfiguration configuration,
-            IFaceServiceClient faceClient)
+            IFaceServiceClient faceClient,
+            IPhotoCompressor photoCompressor)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -47,6 +51,7 @@ namespace VueJsAspNetCoreSample.Controllers
             _db = db;
             _configuration = configuration;
             _faceClient = faceClient;
+            _photoCompressor = photoCompressor;
         }
 
         [HttpPost]
@@ -192,7 +197,7 @@ namespace VueJsAspNetCoreSample.Controllers
             if (user.Photo != null)
             {
                 var photo = user.Photo.Substring(_configuration["FaceClient:ImgPrefix"].Length);
-                user.Photo = photo;
+                user.Photo = _photoCompressor.CompressPhoto(photo);
             }
             var filter = Builders<PersonDocument>.Filter.Eq(x => x.Id, user.Id);
             var result = await _db.Persons.ReplaceOneAsync(filter, user);

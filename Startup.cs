@@ -43,6 +43,7 @@ namespace VueJsAspNetCoreSample {
             services.AddSingleton(db);
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
+            services.AddTransient<IPhotoCompressor, ImageServices>();
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddSingleton<IFaceServiceClient>(new FaceServiceClient(Configuration["FaceClient:SubscriptionKey"]));
         }
