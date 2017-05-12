@@ -14,8 +14,9 @@
                                 <h2 class="label">You Avatar:</h2>
                                 <a>
                                     <span class="label" style="color:green" @click="removeMessage">{{message}}</span>
+                                    <span class="label" style="color:red" @click="removeMessage">{{errorUploadImg}}</span>                        
                                 </a>
-                                <img :src="image" style="width:auto;height:300px;border:ridge" />
+                                <img id="img" :src="image" style="width:auto;height:300px;border:ridge" />
                             </div>
                             <div v-if="isSelectedPhotos == false">
                                 <a>
@@ -49,7 +50,9 @@
             <div class="tile is-parent is-6" v-if="isRecognitionLogsPage">
                 <article class="tile is-child box" id="outer">
                     <div id="inner">
-                        <h2>Recognition Logs</h2>
+                        <div class="content has-text-centered">
+                            <h1> Paralect FaceAccess System</h1>
+                        </div>
                     </div>
                 </article>
             </div>
@@ -90,12 +93,8 @@
 
 <script>
   import accountDs from 'components/AccountDataService'
-  import Avatar from 'vue-avatar/dist/Avatar' 
 
   export default {
-    components: {       
-        Avatar
-    },
     data() {
         return {
             image: '',
@@ -114,7 +113,8 @@
 
             fullName:'',
             personId:'',
-            created:''
+            created:'',
+            errorUploadImg: ''
       }
     },
      mounted(){
@@ -129,6 +129,7 @@
         })
     },
     methods: {
+       
         onFileChange(e) {
             var files = e.target.files || e.dataTransfer.files;
             if (!files.length)
@@ -139,7 +140,9 @@
             var image = new Image();
             var reader = new FileReader();
             var vm = this;
-
+            if(!file.type.match(/image.*/)){
+                return this.errorUploadImg ="This file not image!"
+            }
             reader.onload = (e) => {
                 this.image = e.target.result;
                 this.isSelectedPhotos = true;
@@ -180,6 +183,16 @@
             })       
         },
         updateUser(){
+            var img = document.getElementById("img");    
+            img.src = this.image;
+
+            var canvas = document.createElement("canvas")
+            canvas.width = img.width;
+            canvas.height = img.height;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            this.image = canvas.toDataURL("image/jpeg");           
+
             accountDs.updateUser(this.$route.params.id, this.isSelectedPhotos ? this.image.toString('base64') : null, this.personId, this.fullName, this.created, this.isSelectedPhotos).then((res) => {
                 if(res.data.statusCode === 200){
                     this.message = "Changes successfully saved";
@@ -188,6 +201,7 @@
         },
         removeMessage(){
             this.message = '';
+            this.errorUploadImg = '';
         },
          removeMessageOkChangePassword(){
              this.messageOkChangePassword = '';

@@ -7,6 +7,6 @@ namespace VueJsAspNetCoreSample.Services
 {
    public interface IPhotoCompressor
     {
-        string CompressPhoto(string photo);
+        string CompressPhoto(string photo, int maxWidth, int maxHeight);
     }
 }

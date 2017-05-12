@@ -50,10 +50,10 @@ namespace VueJsAspNetCoreSample.Services
             return image;
         }
 
-        public string CompressPhoto(string photo)
+        public string CompressPhoto(string photo, int maxWidth, int maxHeight)
         {
             var photoAsImage = Base64ToImage(photo);
-            var photoAfterCompress = ScaleImage(photoAsImage, 600, 800);
+            var photoAfterCompress = ScaleImage(photoAsImage, maxWidth, maxHeight);
             return ImageToBase64(photoAfterCompress);
         }
 
