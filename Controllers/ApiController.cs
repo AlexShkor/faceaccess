@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -62,26 +63,41 @@ namespace VueJsAspNetCoreSample.Controllers {
             public string Photo { get; set; }
         }
 
+        public class FacesUploadModel
+        {
+            public string UserID { get; set; }
+            public string[] Photos { get; set; }
+        }
+
         [Route ("faces")]
         [HttpPost]
-        public async Task<IActionResult> AddFace ([FromBody] FaceUploadModel model) {
-            var cursor = await _db.Persons.FindAsync (Builders<PersonDocument>.Filter.Eq (x => x.Id, model.UserID));
-            var doc = await cursor.FirstAsync ();
-            var photo = model.Photo.Substring (_configuration["FaceClient:ImgPrefix"].Length);
-            var bytes = Convert.FromBase64String (photo);
-            var memoryStream = new MemoryStream (bytes);
-            var result = await _faceClient.AddPersonFaceAsync (_configuration["FaceClient:PersonGroupKey"], doc.PersonId, memoryStream /*, null, targetFace */ );
+        public async Task<IActionResult> AddFace([FromBody] FacesUploadModel model)
+        {
+            var cursor = await _db.Persons.FindAsync(Builders<PersonDocument>.Filter.Eq(x => x.Id, model.UserID));
+            var doc = await cursor.FirstAsync();
+            List<FaceDocument> facesDoc = new List<FaceDocument>();
+            foreach (var photoFace in model.Photos)
+            {
+                var photo = photoFace.Substring(_configuration["FaceClient:ImgPrefix"].Length);
+                var bytes = Convert.FromBase64String(photo);
+                var memoryStream = new MemoryStream(bytes);
+                var result = await _faceClient.AddPersonFaceAsync(_configuration["FaceClient:PersonGroupKey"], doc.PersonId, memoryStream /*, null, targetFace */ );
 
-            var face = new FaceDocument () {
-                Id = ObjectId.GenerateNewId ().ToString (),
+                var face = new FaceDocument()
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
                     UserId = doc.Id,
                     ImageBase64 = photo,
                     PersonId = doc.PersonId,
                     PersistedFaceId = result.PersistedFaceId,
                     Created = DateTime.Now
-            };
-            await _db.Faces.InsertOneAsync(face);
-            return this.Json (face);
+                };
+                facesDoc.Add(face);
+                await _db.Faces.InsertOneAsync(face);
+            }
+            facesDoc.ForEach(c => c.ImageBase64 = _configuration["FaceClient:ImgPrefix"] + c.ImageBase64);
+
+            return this.Json(facesDoc);
         }
 
         [Route("{photoId}/deletePhoto")]

@@ -7,10 +7,10 @@ export default {
   getFaces(userId) {
       return DataService.get("api/users/" + userId + "/faces");
   },
-  addFace(userId, photo){
+  addFace(userId, photos){
       return DataService.post("api/users/faces", {
       userId: userId,
-      photo: photo
+      photos: photos
     });
   },
   detectFace(userId, photo){
