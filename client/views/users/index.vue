@@ -3,9 +3,15 @@
       <div class="tile is-parent">
         <article class="tile is-child box">
           <h4 class="title">Users</h4>
+            <a>
+                <span class="label" style="color:green" @click="removeMessage">{{message}}</span>
+            </a>
             <div class="content">
                 <a class="button is-warning" @click='view'>
                     Refresh
+                </a>
+                <a class="button is-danger" @click='train'>
+                    Train neural network
                 </a>
             </div>
           <table class="table">
@@ -53,7 +59,9 @@
     data() {
       return {
         userName: '',
-        users: []
+        users: [],
+        message:''
+
       }
     }, 
     beforeRouteEnter (to, from, next) {
@@ -68,7 +76,16 @@
         usersDs.getAll().then((response) => {
             this.users = response.data;
           });
-      }
+      },
+        train() {
+            usersDs.train().then((response) =>{
+                if(response.data.statusCode === 200)
+                    this.message = "Train neural network successfully completed"
+            });
+        },
+        removeMessage(){
+            this.message = '';
+        },
     }
   }
 </script>

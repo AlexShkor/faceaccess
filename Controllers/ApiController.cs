@@ -162,7 +162,7 @@ namespace VueJsAspNetCoreSample.Controllers {
         [HttpPost]
         public async Task<IActionResult> Train () {
             await _faceClient.TrainPersonGroupAsync (_configuration["FaceClient:PersonGroupKey"]);
-            return this.Ok ();
+            return this.Json(Ok());
         }
 
         public class IdentifyRequest {
