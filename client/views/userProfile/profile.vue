@@ -2,7 +2,7 @@
     <div>
        
         <a :class="{'button is-info' : !isAvatarPage, 'button is-default': isAvatarPage}" @click="getAvatar">Avatar</a>
-        <a :class="{'button is-info' : !isRecognitionLogsPage, 'button is-default': isRecognitionLogsPage}" @click="getRecognitionLogs">Recognition logs</a>
+        <a :class="{'button is-info' : !isDetecFacePage, 'button is-default': isDetecFacePage}" @click="getisDetecFace">Detect face</a>
         <a :class="{'button is-info' : !isPasswordPage, 'button is-default': isPasswordPage}" @click="getPassword">Change password</a>
 
         <div class="tile is-ancestor">
@@ -47,12 +47,25 @@
                     </div>
                 </article>
             </div>
-            <div class="tile is-parent is-6" v-if="isRecognitionLogsPage">
+            <div class="tile is-parent is-6" v-if="isDetecFacePage">
                 <article class="tile is-child box" id="outer">
                     <div id="inner">
-                        <div class="content has-text-centered">
-                            <h1> Paralect FaceAccess System</h1>
-                        </div>
+                        <article class="tile is-child box">
+                            <h4 class="title">Detect Face</h4>
+                            <div class="content">
+                                <div>Пользователь {{ $route.params.id }}</div>
+                                <div>Имя {{ currentName }}</div>
+                                <div>currentFaceId {{ currentFaceId }}</div>
+                                <canvas id="canvas" width="400" height="300"></canvas>
+                                <div class="content">
+                                    <vue-webcam ref='webcam'></vue-webcam>
+                                </div>
+                                <div class="block">
+                                    <button class="button is-primary" @click='takePhoto'>Take Photo</button>
+                                    <button class="button is-danger" @click='detect'>Detect Face</button>
+                                </div>
+                            </div>
+                        </article>
                     </div>
                 </article>
             </div>
@@ -93,8 +106,16 @@
 
 <script>
   import accountDs from 'components/AccountDataService'
+  import usersDs from 'components/UsersDataService'
+  import VueWebcam from 'components/Webcam'
+
+  var interval = null;
+  const prefix = "data:image/jpeg;base64,";
 
   export default {
+    components: {
+        VueWebcam
+    },
     data() {
         return {
             image: '',
@@ -102,7 +123,7 @@
             isSelectedPhotos: false,
 
             isAvatarPage: true,
-            isRecognitionLogsPage: false,
+            isDetecFacePage: false,
             isPasswordPage: false,
 
             email:'',
@@ -114,7 +135,11 @@
             fullName:'',
             personId:'',
             created:'',
-            errorUploadImg: ''
+            errorUploadImg: '',
+
+            currentPhoto: null,
+            currentFaceId: null,
+            currentName: null,
       }
     },
      mounted(){
@@ -129,7 +154,47 @@
         })
     },
     methods: {
-       
+        takePhoto() {
+            this.currentName = '';
+            this.currentPhoto = this.$refs.webcam.getPhoto();
+            var canvas = document.getElementById('canvas');
+            var ctx = canvas.getContext('2d');
+            var img = new Image
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0); // Or at whatever offset you like
+            };
+            img.src = this.currentPhoto;
+        },
+      detect() {
+          if(this.currentPhoto == null){
+              return;
+          }
+          usersDs.detectFace(this.$route.params.id, this.currentPhoto.toString('base64')).then((res) => {
+              console.log(res)
+              var rect = res.data.rect;
+              this.currentFaceId = res.data.faceId;
+              var canvas = document.getElementById('canvas');
+              var ctx = canvas.getContext('2d');
+              ctx.beginPath();
+              ctx.lineWidth = "2";
+              ctx.strokeStyle = "green";
+              ctx.rect(rect.left, rect.top, rect.width, rect.height)
+              ctx.stroke();
+              for (let key in res.data.landmarks) {
+                  let point = res.data.landmarks[key];
+                  console.log(point);
+                  ctx.beginPath();
+                  ctx.lineWidth = "2";
+                  ctx.strokeStyle = "blue";
+                  ctx.rect(point.x, point.y, 1, 1)
+                  ctx.stroke();
+              };
+              this.currentName = '';
+              usersDs.identify(this.currentFaceId).then((res) => {
+                  this.currentName = res.data.name;
+              });
+          })
+      },
         onFileChange(e) {
             var files = e.target.files || e.dataTransfer.files;
             if (!files.length)
@@ -208,17 +273,17 @@
         },
         getAvatar(){
             this.isAvatarPage = true;
-            this.isRecognitionLogsPage = false;
+            this.isDetecFacePage = false;
             this.isPasswordPage = false;
         },
         getPassword(){
             this.isAvatarPage = false;
-            this.isRecognitionLogsPage = false;
+            this.isDetecFacePage = false;
             this.isPasswordPage = true;
         },       
-        getRecognitionLogs(){
+        getisDetecFace(){
             this.isAvatarPage = false;
-            this.isRecognitionLogsPage = true;
+            this.isDetecFacePage = true;
             this.isPasswordPage = false;
         },
         deleteError(data){
