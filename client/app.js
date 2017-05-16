@@ -7,10 +7,12 @@ import router from './router'
 import store from './store'
 import * as filters from './filters'
 import { TOGGLE_SIDEBAR } from 'vuex-store/mutation-types'
+import Avatar from 'vue-avatar' 
 
 Vue.prototype.$http = axios
 Vue.axios = axios
 Vue.use(NProgress)
+Vue.use(Avatar)
 
 // Enable devtools
 Vue.config.devtools = true

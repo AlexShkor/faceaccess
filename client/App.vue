@@ -12,7 +12,6 @@
 import NprogressContainer from 'vue-nprogress/src/NprogressContainer'
 import { Navbar, Sidebar, AppMain, FooterBar } from 'components/layout/'
 import { mapGetters, mapActions } from 'vuex'
-import Avatar from 'vue-avatar/dist/Avatar' 
 
 export default {
   components: {
@@ -20,8 +19,7 @@ export default {
     Sidebar,
     AppMain,
     FooterBar,
-    NprogressContainer,
-    Avatar
+    NprogressContainer
   },
 
   beforeMount () {
