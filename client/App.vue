@@ -4,7 +4,7 @@
     <navbar :show="true"></navbar>
     <sidebar :show="sidebar.opened && !sidebar.hidden"></sidebar>
     <app-main></app-main>
-    <footer-bar></footer-bar>
+    <footer-bar></footer-bar>   
   </div>
 </template>
 
@@ -12,6 +12,7 @@
 import NprogressContainer from 'vue-nprogress/src/NprogressContainer'
 import { Navbar, Sidebar, AppMain, FooterBar } from 'components/layout/'
 import { mapGetters, mapActions } from 'vuex'
+import Avatar from 'vue-avatar/dist/Avatar' 
 
 export default {
   components: {
@@ -19,7 +20,8 @@ export default {
     Sidebar,
     AppMain,
     FooterBar,
-    NprogressContainer
+    NprogressContainer,
+    Avatar
   },
 
   beforeMount () {

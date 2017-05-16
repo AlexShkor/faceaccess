@@ -15,7 +15,20 @@
               </div>
           </a>
         </div>
-        <div class="nav-right is-flex"></div>
+        <div class="nav-right is-flex" v-if="!isAuth">
+          <a class="nav-item hero-brand" href="#/login">
+            <div class="is-hidden-mobile">
+              <strong>Login</strong>
+            </div>
+          </a>
+        </div>
+        <div class="nav-right is-flex" v-if="isAuth">
+          <a class="nav-item hero-brand" @click='logOff'>
+            <div class="is-hidden-mobile">
+              <strong>LogOff</strong>
+            </div>
+          </a>
+        </div>
       </nav>
     </div>
   </section>
@@ -24,9 +37,15 @@
 <script>
 import Tooltip from 'vue-bulma-tooltip'
 import { mapGetters, mapActions } from 'vuex'
+import accountDs from 'components/AccountDataService'
+
 
 export default {
-
+  data() {
+      return {
+        isAuth: false
+      }
+    }, 
   components: {
     Tooltip
   },
@@ -34,15 +53,28 @@ export default {
   props: {
     show: Boolean
   },
-
+  mounted() {
+      if(localStorage.getItem('UserId') != null){
+       this.isAuth = true;
+       }     
+    },
   computed: mapGetters({
     pkginfo: 'pkg',
     sidebar: 'sidebar'
   }),
 
-  methods: mapActions([
+  methods: {
+  ...mapActions([
     'toggleSidebar'
-  ])
+  ]),
+   logOff(){
+     accountDs.logOff().then((response) => {
+         localStorage.removeItem('IsAdmin');
+         localStorage.removeItem('UserId');
+         location.reload();
+    });
+  }
+  }
 }
 </script>
 

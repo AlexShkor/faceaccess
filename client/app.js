@@ -23,9 +23,23 @@ const { state } = store
 
 router.beforeEach((route, redirect, next) => {
   if (state.app.device.isMobile && state.app.sidebar.opened) {
-    store.commit(TOGGLE_SIDEBAR, false)
+      store.commit(TOGGLE_SIDEBAR, false);
   }
-  next()
+
+  if (route.meta.isRequiresAuth) {
+      if (localStorage.getItem('UserId') == null) {         
+          next({ name: 'Login' });
+      } 
+      else if(localStorage.getItem('IsAdmin') == "false" && route.meta.isAdmin) {
+          next({ name: 'Dashboard' });
+      }else {
+          next();
+      }
+  } else if (localStorage.getItem('UserId') == null) {
+      next();
+  } else {
+      next({ name: 'Dashboard' });
+  }   
 })
 
 Object.keys(filters).forEach(key => {

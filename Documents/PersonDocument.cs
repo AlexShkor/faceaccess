@@ -10,5 +10,7 @@ namespace VueJsAspNetCoreSample.Documents
         public string Name {get;set;}
         public Guid PersonId {get; set;}
         public DateTime Created { get;  set; }
+        public string Photo { get; set; }
+        public bool IsUploadPhoto { get; set; }
     }
 }

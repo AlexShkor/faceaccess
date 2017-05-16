@@ -1,6 +1,7 @@
 import * as types from '../../mutation-types'
 import lazyLoading from './lazyLoading'
 import tables from './tables'
+import userProfile from './userProfile'
 
 // show: meta.label -> name
 // name: component name
@@ -12,7 +13,8 @@ const state = {
       name: 'Dashboard',
       path: '/dashboard',
       meta: {
-        icon: 'fa-tachometer'
+          icon: 'fa-tachometer',
+          isRequiresAuth: true          
       },
       component: lazyLoading('dashboard', true)
     },
@@ -20,7 +22,9 @@ const state = {
       name: 'Users',
       path: '/users',
       meta: {
-        icon: 'fa-users',
+          icon: 'fa-users',
+          isRequiresAuth: true,
+          isAdmin: true
       },
       component: lazyLoading('users', true)
     },
@@ -28,10 +32,12 @@ const state = {
       name: 'Testing',
       path: '/testing',
       meta: {
-        icon: 'fa-rocket',
+          icon: 'fa-rocket',
+          isRequiresAuth: true
       },
       component: lazyLoading('testing', true)
     },
+    userProfile,
     tables
   ]
 }
@@ -45,6 +51,7 @@ const mutations = {
     } else if (menuItem.item && 'expanded' in menuItem.item.meta) {
       menuItem.item.meta.expanded = menuItem.expanded
     }
+
   }
 }
 

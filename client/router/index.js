@@ -4,23 +4,67 @@ import menuModule from 'vuex-store/modules/menu'
 Vue.use(Router)
 
 export default new Router({
-  mode: 'hash', // Demo is living in GitHub.io, so required!
-  linkActiveClass: 'is-active',
-  scrollBehavior: () => ({ y: 0 }),
-  routes: [
-    {
-      name: 'Home',
-      path: '/',
-      component: require('../views/Home')
-    },
-    {
-      name: 'User',
-      path: '/users/:id',
-       meta: {
-        icon: 'fa-user'
+    mode: 'hash', // Demo is living in GitHub.io, so required!
+    linkActiveClass: 'is-active',
+    scrollBehavior: () => ({ y: 0 }),
+    routes: [
+      {
+          name: 'Home',
+          path: '/',
+          component: require('../views/Home'),
+          meta: {
+              isRequiresAuth: false
+          }
       },
-      component: require('../views/userProfile')
-    },
+      {
+          name: 'User',
+          path: '/users/:id',
+          meta: {
+              icon: 'fa-user',
+              isRequiresAuth: true
+          },
+          component: require('../views/userProfile/addFaces')
+      },
+            {
+                name: 'Profile',
+                path: '/userProfile/profile/:id',
+                meta: {
+                    isRequiresAuth: true
+                },
+                component: require('../views/userProfile/profile')
+            },
+      {
+          name: 'Login',
+          path: '/login',
+          component: require('../views/login'),
+          meta: {
+              isRequiresAuth: false
+          }
+      },
+       {
+           name: 'RegistrationAccount',
+           path: '/registrationAccount',
+           component: require('../views/registrationAccount'),
+           meta: {
+               isRequiresAuth: false
+           }
+       },
+       {
+           name: 'ForgotPassword',
+           path: '/forgotPassword',
+           component: require('../views/forgotPassword'),
+           meta: {
+               isRequiresAuth: false
+           }
+       },
+       {
+           name: 'ResetPassword',
+           path: '/resetPassword/*',
+           component: require('../views/resetPassword'),
+           meta: {
+               isRequiresAuth: false
+           }
+       },
     ...generateRoutesFromMenu(menuModule.state.items),
     {
       path: '*',

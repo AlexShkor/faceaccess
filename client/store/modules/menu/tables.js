@@ -1,20 +1,21 @@
 import lazyLoading from './lazyLoading'
 
 export default {
-  name: 'Tables',
-  meta: {
+name: 'Tables',
+    meta: {
     icon: 'fa-table',
-    expanded: false
-  },
-
-  children: [
-    {
+    expanded: false,
+    isRequiresAuth: true
+    },
+children: [
+  {
       name: 'BasicTables',
       path: '/tables/basic',
       meta: {
-        label: 'Basic Tables'
+          label: 'Basic Tables',
+          isRequiresAuth: true
       },
       component: lazyLoading('tables/Basic')
-    }
-  ]
+  }
+]
 }

@@ -13,6 +13,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using VueJsAspNetCoreSample.Documents;
 using VueJsAspNetCoreSample.Middleware;
+using VueJsAspNetCoreSample.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.MongoDB;
+using Microsoft.ProjectOxford.Face;
 
 namespace VueJsAspNetCoreSample {
     public class Startup {
@@ -31,11 +35,18 @@ namespace VueJsAspNetCoreSample {
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices (IServiceCollection services) {
+            services.AddIdentityWithMongoStores(Configuration.GetConnectionString("MongoDbConnection"))
+                .AddDefaultTokenProviders();
             // Add framework services.
             services.AddMvc ();
             // Mongo
-            var db = new MongoDatabase("mongodb://admin:admin@ds157809.mlab.com:57809/faceaccess");
+            var db = new MongoDatabase(Configuration.GetConnectionString("MongoDbConnection"));
             services.AddSingleton(db);
+            services.AddTransient<IEmailSender, AuthMessageSender>();
+            services.AddTransient<ISmsSender, AuthMessageSender>();
+            services.AddTransient<IPhotoCompressor, ImageServices>();
+            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSingleton<IFaceServiceClient>(new FaceServiceClient(Configuration["FaceClient:SubscriptionKey"]));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +60,7 @@ namespace VueJsAspNetCoreSample {
 
             app.UseDefaultFiles ();
             app.UseStaticFiles ();
+            app.UseIdentity();
             app.UseWebSockets();
 
             app.Map("/ws", builder =>
@@ -76,6 +88,7 @@ namespace VueJsAspNetCoreSample {
                     defaults : new { controller = "Home", action = "Index" });
             });
             app.UseCors(cpb => cpb.AllowCredentials().AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            DatabaseIdentityInitialize(app.ApplicationServices).Wait();
         }
 
         private async Task Echo(WebSocket webSocket)
@@ -92,6 +105,24 @@ namespace VueJsAspNetCoreSample {
             await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
             await file.FlushAsync();
             file.Dispose();
+        }
+
+        private async Task DatabaseIdentityInitialize(IServiceProvider serviceProvider)
+        {
+            UserManager<IdentityUser> userManager =
+                serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+            string adminEmail = Configuration["AdminCredentials:Email"];
+            string password = Configuration["AdminCredentials:Password"];
+            if (await userManager.FindByNameAsync(adminEmail) == null)
+            {
+                IdentityUser admin = new IdentityUser { Email = adminEmail, UserName = adminEmail };
+                IdentityResult result = await userManager.CreateAsync(admin, password);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(admin, "admin");
+                }
+            }
         }
     }
 }
