@@ -62,7 +62,7 @@
                                 </div>
                                 <div class="block">
                                     <button class="button is-primary" @click='takePhoto'>Take Photo</button>
-                                    <button class="button is-danger" @click='detect'>Detect Face</button>
+                                    <button class="button is-danger" @click='detect' :disabled="!currentPhoto">Detect Face</button>
                                 </div>
                             </div>
                         </article>
@@ -166,9 +166,6 @@
             img.src = this.currentPhoto;
         },
       detect() {
-          if(this.currentPhoto == null){
-              return;
-          }
           usersDs.detectFace(this.$route.params.id, this.currentPhoto.toString('base64')).then((res) => {
               console.log(res)
               var rect = res.data.rect;

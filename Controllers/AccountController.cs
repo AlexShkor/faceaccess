@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using faceaccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,6 @@ namespace VueJsAspNetCoreSample.Controllers
         private readonly ILogger _logger;
         private IFaceServiceClient _faceClient;
         private MongoDatabase _db;
-        private IConfiguration _configuration;
 
 
         public AccountController(
@@ -37,7 +37,6 @@ namespace VueJsAspNetCoreSample.Controllers
             IEmailSender emailSender,
             ILoggerFactory loggerFactory,
             MongoDatabase db,
-            IConfiguration configuration,
             IFaceServiceClient faceClient)
         {
             _userManager = userManager;
@@ -45,7 +44,6 @@ namespace VueJsAspNetCoreSample.Controllers
             _emailSender = emailSender;
             _logger = loggerFactory.CreateLogger<AccountController>();
             _db = db;
-            _configuration = configuration;
             _faceClient = faceClient;
         }
 
@@ -163,10 +161,10 @@ namespace VueJsAspNetCoreSample.Controllers
                 if (userProfile.Photo == "" | userProfile.Photo == null)
                 {
                     var imageBase64 = _db.AvatarDefault.AsQueryable().First().Photo;
-                    userProfile.Photo = _configuration["FaceClient:ImgPrefix"] + imageBase64;
+                    userProfile.Photo = Setting.FaceClientImgPrefix + imageBase64;
                     return this.Json(userProfile);
                 }
-                    var avatarUser = _configuration["FaceClient:ImgPrefix"] + userProfile.Photo;
+                    var avatarUser = Setting.FaceClientImgPrefix + userProfile.Photo;
                     userProfile.Photo = avatarUser;
                     userProfile.IsUploadPhoto = true;
                     return this.Json(userProfile);                        
@@ -180,7 +178,7 @@ namespace VueJsAspNetCoreSample.Controllers
             var imageBase64 = _db.AvatarDefault.AsQueryable().First().Photo;
             if (imageBase64 != "")
             {
-                var avatarDefault = _configuration["FaceClient:ImgPrefix"] + imageBase64;
+                var avatarDefault = Setting.FaceClientImgPrefix + imageBase64;
                 return this.Json(avatarDefault);
             }
             return this.Json(BadRequest());
@@ -191,7 +189,7 @@ namespace VueJsAspNetCoreSample.Controllers
         {
             if (user.Photo != null)
             {
-                var photo = user.Photo.Substring(_configuration["FaceClient:ImgPrefix"].Length);             
+                var photo = user.Photo.Substring(Setting.FaceClientImgPrefix.Length);             
                 user.Photo = photo;
             }
             var filter = Builders<PersonDocument>.Filter.Eq(x => x.Id, user.Id);
@@ -206,7 +204,7 @@ namespace VueJsAspNetCoreSample.Controllers
         private async Task CreatePerson(string id, string name)
         {
             PersonDocument doc = new PersonDocument();
-            var data = _faceClient.CreatePersonAsync(_configuration["FaceClient:PersonGroupKey"], name);
+            var data = _faceClient.CreatePersonAsync(Setting.FaceClientSubscriptionKey, name);
             doc.PersonId = data.Result.PersonId;
             doc.Created = DateTime.Now;
             doc.Id = id;

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using faceaccess;
 using MailKit.Net.Smtp;
 using MimeKit;
 using MailKit.Security;
@@ -8,16 +9,10 @@ namespace VueJsAspNetCoreSample.Services
 {
     public class AuthMessageSender : IEmailSender, ISmsSender
     {
-        private IConfiguration _configuration;
-
-        public AuthMessageSender(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
         public void SendEmailAsync(string email, string subject, string textMessage)
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(_configuration["EmailSender:Name"], _configuration["EmailSender:EmailForAuth"]));
+            message.From.Add(new MailboxAddress(Setting.EmailSenderName, Setting.EmailSenderEmailForAuth));
             message.To.Add(new MailboxAddress("",email));
             message.Subject = subject;
             message.Body = new TextPart("html")
@@ -27,9 +22,9 @@ namespace VueJsAspNetCoreSample.Services
             using (var client = new SmtpClient())
             {
                 client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-                client.Connect(_configuration["EmailSender:Host"], 587, false);
+                client.Connect(Setting.EmailSenderHost, 587, false);
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
-                client.Authenticate(_configuration["EmailSender:EmailForAuth"], _configuration["EmailSender:PasswordFromMail"]);
+                client.Authenticate(Setting.EmailSenderEmailForAuth, Setting.EmailSenderPasswordFromMail);
 
                 client.Send(message);
                 client.Disconnect(true);

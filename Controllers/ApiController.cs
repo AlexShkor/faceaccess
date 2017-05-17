@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using faceaccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.MongoDB;
@@ -19,11 +20,9 @@ namespace VueJsAspNetCoreSample.Controllers {
     public class UsersController : Controller {
         private MongoDatabase _db;
         private IFaceServiceClient _faceClient;
-        private IConfiguration _configuration;   
 
-        public UsersController (MongoDatabase db, IConfiguration configuration, IFaceServiceClient faceClient) {
+        public UsersController (MongoDatabase db, IFaceServiceClient faceClient) {
             _db = db;
-            _configuration = configuration;
             _faceClient = faceClient;
         }
         [Authorize(Roles = "ADMIN")]
@@ -35,7 +34,7 @@ namespace VueJsAspNetCoreSample.Controllers {
             {
                 if (!string.IsNullOrEmpty(user.Photo))
                 {
-                    user.Photo = _configuration["FaceClient:ImgPrefix"] + user.Photo;
+                    user.Photo = Setting.FaceClientImgPrefix + user.Photo;
                 }
             }
             return this.Json (users);
@@ -45,7 +44,7 @@ namespace VueJsAspNetCoreSample.Controllers {
         [HttpGet]
         public IActionResult Faces (string userId) {
             return this.Json (_db.Faces.AsQueryable ().Where (x => x.UserId == userId).ToList ().Select (x => {
-                x.ImageBase64 = _configuration["FaceClient:ImgPrefix"] + x.ImageBase64;
+                x.ImageBase64 = Setting.FaceClientImgPrefix + x.ImageBase64;
                 return x;
             }));
         }
@@ -78,10 +77,10 @@ namespace VueJsAspNetCoreSample.Controllers {
             List<FaceDocument> facesDoc = new List<FaceDocument>();
             foreach (var photoFace in model.Photos)
             {
-                var photo = photoFace.Substring(_configuration["FaceClient:ImgPrefix"].Length);
+                var photo = photoFace.Substring(Setting.FaceClientImgPrefix.Length);
                 var bytes = Convert.FromBase64String(photo);
                 var memoryStream = new MemoryStream(bytes);
-                var result = await _faceClient.AddPersonFaceAsync(_configuration["FaceClient:PersonGroupKey"], doc.PersonId, memoryStream /*, null, targetFace */ );
+                var result = await _faceClient.AddPersonFaceAsync(Setting.FaceClientPersonGroupKey, doc.PersonId, memoryStream /*, null, targetFace */ );
 
                 var face = new FaceDocument()
                 {
@@ -95,7 +94,7 @@ namespace VueJsAspNetCoreSample.Controllers {
                 facesDoc.Add(face);
                 await _db.Faces.InsertOneAsync(face);
             }
-            facesDoc.ForEach(c => c.ImageBase64 = _configuration["FaceClient:ImgPrefix"] + c.ImageBase64);
+            facesDoc.ForEach(c => c.ImageBase64 = Setting.FaceClientImgPrefix + c.ImageBase64);
 
             return this.Json(facesDoc);
         }
@@ -109,7 +108,7 @@ namespace VueJsAspNetCoreSample.Controllers {
             {
                 return this.Json(BadRequest());
             }
-            await _faceClient.DeletePersonFaceAsync(_configuration["FaceClient:PersonGroupKey"], cursor.PersonId, cursor.PersistedFaceId);       
+            await _faceClient.DeletePersonFaceAsync(Setting.FaceClientPersonGroupKey, cursor.PersonId, cursor.PersistedFaceId);       
             return this.Json(Ok());
         }
 
@@ -119,7 +118,7 @@ namespace VueJsAspNetCoreSample.Controllers {
             //var faceDetect = await _faceClient.DetectAsync(this.Request.Body,true,true);
             //var targetFace = faceDetect.First().FaceRectangle;
             //this.Request.Body.Seek(0, SeekOrigin.Begin);
-            var photo = model.Photo.Substring (_configuration["FaceClient:ImgPrefix"].Length);
+            var photo = model.Photo.Substring (Setting.FaceClientImgPrefix.Length);
             var bytes = Convert.FromBase64String (photo);
 
             var memoryStream = new MemoryStream (bytes);
@@ -138,7 +137,7 @@ namespace VueJsAspNetCoreSample.Controllers {
         [HttpPost]
         public async Task<IActionResult> Check () {
             var faceDetect = await _faceClient.DetectAsync(this.Request.Body);
-            var identity = await _faceClient.IdentifyAsync(_configuration["FaceClient:PersonGroupKey"], new[]{faceDetect[0].FaceId});
+            var identity = await _faceClient.IdentifyAsync(Setting.FaceClientPersonGroupKey, new[]{faceDetect[0].FaceId});
             var result = identity.FirstOrDefault()?.Candidates.FirstOrDefault() ?? new Candidate();
             var response = new CheckResponse {
               Access = false,
@@ -151,7 +150,7 @@ namespace VueJsAspNetCoreSample.Controllers {
               var doc = _db.Persons.AsQueryable ().Where (x => x.PersonId == response.PersonId).FirstOrDefault ();
               response.Name = doc.Name;
             }
-            if (response.Confidence >= Convert.ToDouble(_configuration["FaceClient:ConfidenceTreshold"]))
+            if (response.Confidence >= Convert.ToDouble(ConfidenceTreshold))
             {
               response.Access = true;
             }
@@ -161,7 +160,7 @@ namespace VueJsAspNetCoreSample.Controllers {
         [Route ("train")]
         [HttpPost]
         public async Task<IActionResult> Train () {
-            await _faceClient.TrainPersonGroupAsync (_configuration["FaceClient:PersonGroupKey"]);
+            await _faceClient.TrainPersonGroupAsync (Setting.FaceClientPersonGroupKey);
             return this.Json(Ok());
         }
 
@@ -172,7 +171,7 @@ namespace VueJsAspNetCoreSample.Controllers {
         [Route ("identify")]
         [HttpPost]
         public async Task<IActionResult> Identify ([FromBody] IdentifyRequest request) {
-            var result = await _faceClient.IdentifyAsync (_configuration["FaceClient:PersonGroupKey"], new [] { request.FaceId });
+            var result = await _faceClient.IdentifyAsync (Setting.FaceClientPersonGroupKey, new [] { request.FaceId });
             var doc = _db.Persons.AsQueryable ().Where (x => x.PersonId == result[0].Candidates[0].PersonId).FirstOrDefault ();
             return this.Json (doc);
         }

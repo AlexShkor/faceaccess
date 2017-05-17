@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using faceaccess;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.Webpack;
@@ -45,7 +46,7 @@ namespace VueJsAspNetCoreSample {
             services.AddTransient<ISmsSender, AuthMessageSender>();
             services.AddTransient<IPhotoCompressor, ImageServices>();
             services.AddSingleton<IConfiguration>(Configuration);
-            services.AddSingleton<IFaceServiceClient>(new FaceServiceClient(Configuration["FaceClient:SubscriptionKey"]));
+            services.AddSingleton<IFaceServiceClient>(new FaceServiceClient(Setting.FaceClientSubscriptionKey));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -113,8 +114,8 @@ namespace VueJsAspNetCoreSample {
             UserManager<IdentityUser> userManager =
                 serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-            string adminEmail = Configuration["AdminCredentials:Email"];
-            string password = Configuration["AdminCredentials:Password"];
+            string adminEmail = Setting.AdminCredentialsEmail;
+            string password = Setting.AdminCredentialsPassword;
             if (await userManager.FindByNameAsync(adminEmail) == null)
             {
                 IdentityUser admin = new IdentityUser { Email = adminEmail, UserName = adminEmail };
