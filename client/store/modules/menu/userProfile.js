@@ -1,4 +1,5 @@
 ﻿import lazyLoading from './lazyLoading'
+import auth from 'components/AuthService'
 
 export default {
 name: 'User Profile',
@@ -11,7 +12,7 @@ name: 'User Profile',
 children: [
 {
     name: 'addFaces',
-    path: '/users/'+localStorage.getItem('UserId'),
+    path: '/users/' + auth.getUserId(),
     meta: {
         label: 'Add Faces',
         isRequiresAuth: true
@@ -20,7 +21,7 @@ children: [
 },
 {
     name: 'profile',
-    path: '/userProfile/profile/'+localStorage.getItem('UserId'),
+    path: '/userProfile/profile/' + auth.getUserId(),
     meta: {
         label: 'Profile',
         isRequiresAuth: true

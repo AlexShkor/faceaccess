@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <aside class="menu app-sidebar animated" :class="{ slideInLeft: show, slideOutLeft: !show }" v-if="isAuth">
     <p class="menu-label">
       General
@@ -39,6 +39,7 @@
 <script>
 import Expanding from 'vue-bulma-expanding'
 import { mapGetters, mapActions } from 'vuex'
+import auth from 'components/AuthService'
 
 export default {
   components: {
@@ -60,12 +61,8 @@ export default {
       this.isReady = true
       this.shouldExpandMatchItem(route)
     }
-    if(localStorage.getItem('UserId') != null){
-       this.isAuth = true;
-       }
-    if(localStorage.getItem('IsAdmin') == "true"){
-        this.isAdmin = true;
-    }
+    this.isAuth = auth.getIsAuth()     
+    this.isAdmin = auth.getIsAdmin()    
   },
 
     computed:{            

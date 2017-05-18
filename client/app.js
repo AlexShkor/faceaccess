@@ -1,4 +1,4 @@
-import Vue from 'vue'
+﻿import Vue from 'vue'
 import axios from 'axios'
 import NProgress from 'vue-nprogress'
 import { sync } from 'vuex-router-sync'
@@ -7,6 +7,7 @@ import router from './router'
 import store from './store'
 import * as filters from './filters'
 import { TOGGLE_SIDEBAR } from 'vuex-store/mutation-types'
+import auth from 'components/AuthService'
 
 Vue.prototype.$http = axios
 Vue.axios = axios
@@ -27,15 +28,15 @@ router.beforeEach((route, redirect, next) => {
   }
 
   if (route.meta.isRequiresAuth) {
-      if (localStorage.getItem('UserId') == null) {         
+      if (!auth.getIsAuth()) {         
           next({ name: 'Login' });
       } 
-      else if(localStorage.getItem('IsAdmin') == "false" && route.meta.isAdmin) {
+      else if (!auth.getIsAdmin() && route.meta.isAdmin) {
           next({ name: 'Dashboard' });
       }else {
           next();
       }
-  } else if (localStorage.getItem('UserId') == null) {
+  } else if (!auth.getIsAuth()) {
       next();
   } else {
       next({ name: 'Dashboard' });

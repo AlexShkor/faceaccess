@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <section class="hero is-bold app-navbar animated" :class="{ slideInDown: show, slideOutDown: !show }">
     <div class="hero-head">
       <nav class="nav">
@@ -38,7 +38,7 @@
 import Tooltip from 'vue-bulma-tooltip'
 import { mapGetters, mapActions } from 'vuex'
 import accountDs from 'components/AccountDataService'
-
+import auth from 'components/AuthService'
 
 export default {
   data() {
@@ -54,9 +54,7 @@ export default {
     show: Boolean
   },
   mounted() {
-      if(localStorage.getItem('UserId') != null){
-       this.isAuth = true;
-       }     
+        this.isAuth = auth.getIsAuth();            
     },
   computed: mapGetters({
     pkginfo: 'pkg',
@@ -69,8 +67,7 @@ export default {
   ]),
    logOff(){
      accountDs.logOff().then((response) => {
-         localStorage.removeItem('IsAdmin');
-         localStorage.removeItem('UserId');
+         localStorage.removeItem('Token');
          location.reload();
     });
   }

@@ -47,6 +47,7 @@
 
 <script>
   import accountDs from 'components/AccountDataService'
+  import auth from 'components/AuthService'
 
   export default {
     data() {
@@ -59,14 +60,11 @@
     methods: {
         sendForm(){
             accountDs.sendLoginForm(this.Email, this.Password).then((response) => {
-                if(response.data.statusCode === 200){
-                    if(response.data.value[0] === "ADMIN"){
-                        localStorage.setItem('IsAdmin', true);
-                    }
-                    if(response.data.value[0] === "USER"){
-                        localStorage.setItem('IsAdmin', false);
-                    }
-                    localStorage.setItem('UserId', response.data.value[1]);
+              if (response.data.statusCode === 200) {
+                    localStorage.setItem('Token', response.data.value);
+                    console.log(auth.getIsAdmin());
+                    console.log(auth.getIsAuth());
+                    console.log(auth.getUserId());
                     location.reload();
                 }
                 if(response.data.statusCode === 400){
