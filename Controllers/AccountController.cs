@@ -218,7 +218,7 @@ namespace VueJsAspNetCoreSample.Controllers
     private async Task CreatePerson(string id, string name)
     {
       PersonDocument doc = new PersonDocument();
-      var data = _faceClient.CreatePersonAsync(Setting.FaceClientSubscriptionKey, name);
+      var data = _faceClient.CreatePersonAsync(Setting.FaceClientPersonGroupKey, name);
       doc.PersonId = data.Result.PersonId;
       doc.Created = DateTime.Now;
       doc.Id = id;

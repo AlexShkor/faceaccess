@@ -10,6 +10,12 @@
             </a>
             <br></br>
           </div>
+          <div v-if="MessageOk">
+            <a class="button is-success" @click='deleteMessageOk()'>
+              {{MessageOk}}
+            </a>
+            <br></br>
+          </div>
           <div class="content">
             <div class="control is-grouped">
               <p class="control is-expanded">
@@ -47,7 +53,8 @@
         FullName: '',
         Password:'',
 		ConfirmPassword:'',
-        Errors:[]
+        Errors: [],
+        MessageOk:''
       }
     },
     methods: {
@@ -62,6 +69,12 @@
                    }else{
                        this.Errors.push(response.data.value);
                    }
+               } else {
+                 this.MessageOk = 'Registration completed successfully!';
+                 this.Email = '';
+                 this.FullName = '';
+                 this.Password = '';
+                 this.ConfirmPassword = '';
                }
             });
           } else{
@@ -71,6 +84,9 @@
       deleteError(data){
           var index = this.Errors.indexOf(data);
           this.Errors.splice(index, 1);
+      },
+      deleteMessageOk() {
+        this.MessageOk = '';
       }
     }
   }

@@ -12,6 +12,12 @@
                 </a>
                 <br></br>
             </div>
+          <div v-if="MessageOk">
+            <a class="button is-success" @click='deleteMessageOk()'>
+              {{MessageOk}}
+            </a>
+            <br></br>
+          </div>
           <div class="content">
             <div class="control is-grouped">
               <p class="control is-expanded">
@@ -37,7 +43,8 @@
     data() {
       return {
         Email:'',
-        Errors:[]
+        Errors: [],
+        MessageOk:''
       }
     },
     methods: {
@@ -51,12 +58,18 @@
                 }else{
                     this.Errors.push(response.data.value);
                 }
+            } else {
+              this.MessageOk = 'The message was sent successfully to your email address!'
+              this.Email = '';
             }
         });
       },
       deleteError(data){
           var index = this.Errors.indexOf(data);
           this.Errors.splice(index, 1);
+      },
+      deleteMessageOk() {
+        this.MessageOk = '';
       }
     }
   }
