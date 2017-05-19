@@ -13,7 +13,7 @@
                 <a class="button is-warning" @click='view'>
                     Refresh
                 </a>
-                <a class="button is-danger" @click='train'>
+                <a class="button is-info" @click='train'>
                     Train neural network
                 </a>
             </div>
