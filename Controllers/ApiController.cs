@@ -22,11 +22,13 @@ namespace VueJsAspNetCoreSample.Controllers
   {
     private MongoDatabase _db;
     private IFaceServiceClient _faceClient;
+    private  UserManager<IdentityUser> _userManager;
 
-    public UsersController(MongoDatabase db, IFaceServiceClient faceClient)
+    public UsersController(MongoDatabase db, IFaceServiceClient faceClient, UserManager<IdentityUser> userManager)
     {
       _db = db;
       _faceClient = faceClient;
+      _userManager = userManager;
     }
     [Authorize(Roles = "ADMIN")]
     [HttpGet]
@@ -54,6 +56,27 @@ namespace VueJsAspNetCoreSample.Controllers
         return x;
       }));
     }
+
+    [Authorize]
+    [Route("deleteUser")]
+    [HttpPost]
+    public async Task<ActionResult> DeleteUser([FromBody] PersonDocument user)
+    {
+      try
+      {
+        await _db.Persons.FindOneAndDeleteAsync(Builders<PersonDocument>.Filter.Eq(x => x.Id, user.Id));
+        await _faceClient.DeletePersonAsync(Setting.FaceClientPersonGroupKey, user.PersonId);
+        await _db.Faces.DeleteManyAsync(Builders<FaceDocument>.Filter.Eq(x => x.PersonId, user.PersonId));
+        var userIdentety = await _userManager.FindByIdAsync(user.Id);
+        await _userManager.DeleteAsync(userIdentety);
+        return this.Json(Ok());
+      }
+      catch (Exception ex)
+      {
+        return this.Json(BadRequest(ex.Message));
+      }
+    }
+
 
     [Authorize]
     [Route("{userId}")]

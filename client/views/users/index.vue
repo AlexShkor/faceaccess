@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <div class="tile is-ancestor">
       <div class="tile is-parent">
         <article class="tile is-child box">
@@ -6,6 +6,9 @@
             <a>
                 <span class="label" style="color:green" @click="removeMessage">{{message}}</span>
             </a>
+          <a>
+            <span class="label" style="color:red" @click="removeMessage">{{error}}</span>
+          </a>
             <div class="content">
                 <a class="button is-warning" @click='view'>
                     Refresh
@@ -37,7 +40,11 @@
                 </td>
                 <td>{{user.created}}</td>
                 <td>{{user.recognitionId}}</td>
-
+                <td>
+                  <a class="button is-danger" @click='deleteUser(user, index)'>
+                    Delete user
+                  </a>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -60,7 +67,8 @@
       return {
         userName: '',
         users: [],
-        message:''
+        message: '',
+        error:''
 
       }
     }, 
@@ -84,8 +92,19 @@
             });
         },
         removeMessage(){
-            this.message = '';
+          this.message = '';
+          this.error = '';
         },
+        deleteUser(user, index) {
+          usersDs.deleteUser(user.id, user.personId, user.created, user.name, user.photo, user.isUploadPhoto).then((res) => {
+            if (res.data.statusCode === 200) {
+              this.message = "User successfully deleted!";
+              this.users.splice(index, 1);
+            } else {
+              this.error = "Error: " + res.data.value;
+            }
+          })
+        }
     }
   }
 </script>

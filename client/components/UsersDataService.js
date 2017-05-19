@@ -1,4 +1,4 @@
-import DataService from './DataService'
+﻿import DataService from './DataService'
 
 export default {
   getAll() {
@@ -30,5 +30,8 @@ export default {
   },
   deletePhoto(photoId) {
       return DataService.get("api/users/" + photoId + "/deletePhoto");
+  },
+  deleteUser(userId, userPersonId, created, name, photo, isUploadPhoto) {
+      return DataService.post('api/users/deleteUser', {Id : userId, Name : name, PersonId : userPersonId, Created : created, Photo: photo, IsUploadPhoto: isUploadPhoto});
   }
 }
